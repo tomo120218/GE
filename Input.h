@@ -12,8 +12,16 @@ public:
 
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 
+	bool PushKey(BYTE keyNumber);
+	bool TriggerKey(BYTE keyNumber);
+
 private:
 
 	ComPtr<IDirectInputDevice8> keyboard;
+	ComPtr<IDirectInput8> diectInput;
+
+	BYTE key[256] = {};
+	BYTE keyPre[256] = {};
+
 };
 

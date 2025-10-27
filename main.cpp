@@ -1204,7 +1204,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	indexDataSprite[0] = 0; indexDataSprite[1] = 1; indexDataSprite[2] = 2;
 	indexDataSprite[3] = 1; indexDataSprite[4] = 3; indexDataSprite[5] = 2;
 
-	hr = DirectInput8Create(wc.hInstance, DIRECTINPUT_VERSION,IID_IDirectInput8,(void**)&directInput, nullptr);
+	hr = DirectInput8Create(wc.hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&directInput, nullptr);
 
 	hr = directInput->CreateDevice(GUID_SysKeyboard, &keyboard, NULL);
 
@@ -1217,13 +1217,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	input = new Input();
 	input->Initialize(wc.hInstance, hwnd);
 
-	keyboard->Acquire();
-
-	/*BYTE key[256]{};
-	keyboard->GetDeviceState(sizeof(key), key);
-	*/BYTE prekey[256]{};
-
-	input->Update();
 
 	MSG msg{};
 	//ウィンドウの×ボタンが押されるまでループ
@@ -1237,15 +1230,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		} else
 		{
 
-			keyboard->Acquire();
-			//memcpy(prekey, key, 256);
-			BYTE key[256] = {};
-			keyboard->GetDeviceState(sizeof(key), key);
+			input->Update();
 
 			//ゲームの処理
-			if (key[DIK_SPACE] && !prekey[DIK_SPACE]) {
+			/*if (key[DIK_SPACE] && !prekey[DIK_SPACE]) {
 				OutputDebugStringA("Preass SPACE\n");
+			}*/
+
+			if (input->PushKey(DIK_SPACE)) {
+				OutputDebugStringA("Hit 0\n");
 			}
+
+			/*if (key[DIK_UP] || key[DIK_DOWN] || key[DIK_RIGHT] || key[DIK_LEFT]) {
+				if (key[DIK_UP]) { object3ds[0].position.y += 1.0f; } 
+				else if (key[DIK_DOWN]) { object3ds[0].position.y -= 1.0f; }
+				if (key[DIK_RIGHT]) { object3ds[0].position.x += 1.0f; }
+				else if (key[DIK_LEFT]) { object3ds[0].position.x -= 1.0f; }
+			}*/
 
 			//Sprite用のWorldViewProjectionMatrixを作る
 			Matrix4x4 worldMatrixSprite = MakeAffineMatrix(transformSprite.scale, transformSprite.rotate, transformSprite.translate);
@@ -1341,7 +1342,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 			//モデル描画
-			commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
+			//commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
 
 
 			ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
@@ -1380,7 +1381,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			assert(SUCCEEDED(hr));
 
 
-			if (key[DIK_ESCAPE]) {
+			if (input->PushKey(DIK_ESCAPE)) {
 				OutputDebugStringA("Pressed Space\n");
 				break;
 			}
