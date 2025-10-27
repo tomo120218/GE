@@ -12,6 +12,11 @@
 #include "externals/imgui/imgui_impl_win32.h"
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+#define DIRECTINPUT_VERSION 0x0800
+#include <dinput.h>
+
+#pragma comment(lib,"dinput8.lib")
+
 #pragma comment(lib,"dxcompiler.lib")
 #pragma comment(lib,"dxguid.lib")
 #pragma comment(lib,"d3d12.lib")
@@ -21,6 +26,8 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 
 #include<fstream>
 #include<sstream>
+
+#include "Input.h"
 
 struct Matrix4x4
 {
@@ -766,14 +773,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		infoQueue->Release();
 	}
 
-
-
 #endif // _DEBUG
-
-
-
-
-
 
 	//コマンドキューの生成
 	ID3D12CommandQueue* commandQueue = nullptr;
@@ -939,10 +939,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	rastrizeDesc.CullMode = D3D12_CULL_MODE_BACK;
 	rastrizeDesc.FillMode = D3D12_FILL_MODE_SOLID;
 
-	IDxcBlob* vertexShaderBlob = CompileShader(L"Object3D.VS.hlsl", L"vs_6_0", dxcUtils, dxcCompiler, includeHandler);
+	IDxcBlob* vertexShaderBlob = CompileShader(L"resources/shaders/Object3d.VS.hlsl", L"vs_6_0", dxcUtils, dxcCompiler, includeHandler);
 	assert(vertexShaderBlob != nullptr);
 
-	IDxcBlob* pixelShaderBlob = CompileShader(L"Object3D.PS.hlsl", L"ps_6_0", dxcUtils, dxcCompiler, includeHandler);
+	IDxcBlob* pixelShaderBlob = CompileShader(L"resources/shaders/Object3d.PS.hlsl", L"ps_6_0", dxcUtils, dxcCompiler, includeHandler);
 	assert(pixelShaderBlob != nullptr);
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
@@ -962,6 +962,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
 
+
 	//DepthStencilStateの設定
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
 	//Depthの機能を有効化する
@@ -978,6 +979,33 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	ID3D12PipelineState* graphicsPipelineState = nullptr;
 	hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));
+	assert(SUCCEEDED(hr));
+
+	// DirectInputの初期化
+	IDirectInput8* directInput = nullptr;
+	hr = DirectInput8Create(
+		wc.hInstance,
+		DIRECTINPUT_VERSION,
+		IID_IDirectInput8,
+		(void**)&directInput,
+		nullptr
+	);
+	assert(SUCCEEDED(hr));
+	IDirectInputDevice8* keyboard = nullptr;
+	hr = directInput->CreateDevice(
+		GUID_SysKeyboard,
+		&keyboard,
+		NULL
+	);
+	assert(SUCCEEDED(hr));
+
+	hr = keyboard->SetDataFormat(&c_dfDIKeyboard);
+	assert(SUCCEEDED(hr));
+
+	hr = keyboard->SetCooperativeLevel(
+		hwnd,
+		DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY
+	);;
 	assert(SUCCEEDED(hr));
 
 	/*
@@ -1176,6 +1204,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	indexDataSprite[0] = 0; indexDataSprite[1] = 1; indexDataSprite[2] = 2;
 	indexDataSprite[3] = 1; indexDataSprite[4] = 3; indexDataSprite[5] = 2;
 
+	hr = DirectInput8Create(wc.hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&directInput, nullptr);
+
+	hr = directInput->CreateDevice(GUID_SysKeyboard, &keyboard, NULL);
+
+	hr = keyboard->SetDataFormat(&c_dfDIKeyboard);
+
+	hr = keyboard->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
+
+	Input* input = nullptr;
+
+	input = new Input();
+	input->Initialize(wc.hInstance, hwnd);
 
 
 	MSG msg{};
@@ -1189,7 +1229,24 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			DispatchMessage(&msg);
 		} else
 		{
+
+			input->Update();
+
 			//ゲームの処理
+			/*if (key[DIK_SPACE] && !prekey[DIK_SPACE]) {
+				OutputDebugStringA("Preass SPACE\n");
+			}*/
+
+			if (input->PushKey(DIK_SPACE)) {
+				OutputDebugStringA("Hit 0\n");
+			}
+
+			/*if (key[DIK_UP] || key[DIK_DOWN] || key[DIK_RIGHT] || key[DIK_LEFT]) {
+				if (key[DIK_UP]) { object3ds[0].position.y += 1.0f; } 
+				else if (key[DIK_DOWN]) { object3ds[0].position.y -= 1.0f; }
+				if (key[DIK_RIGHT]) { object3ds[0].position.x += 1.0f; }
+				else if (key[DIK_LEFT]) { object3ds[0].position.x -= 1.0f; }
+			}*/
 
 			//Sprite用のWorldViewProjectionMatrixを作る
 			Matrix4x4 worldMatrixSprite = MakeAffineMatrix(transformSprite.scale, transformSprite.rotate, transformSprite.translate);
@@ -1202,7 +1259,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			ImGui_ImplDX12_NewFrame();
 			ImGui_ImplWin32_NewFrame();
 			ImGui::NewFrame();
-
 
 			//transform.rotate.y += 0.03f;
 			/*Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
@@ -1286,7 +1342,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 			//モデル描画
-			commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
+			//commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
 
 
 			ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
@@ -1325,9 +1381,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			assert(SUCCEEDED(hr));
 
 
-
+			if (input->PushKey(DIK_ESCAPE)) {
+				OutputDebugStringA("Pressed Space\n");
+				break;
+			}
 		}
-
 	}
 
 	//変数から型を推測する
@@ -1348,6 +1406,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 
+	delete input;
 
 	indexResourceSprite->Release();
 	transformationMatrixResourceSprite->Release();
