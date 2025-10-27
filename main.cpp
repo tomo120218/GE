@@ -1217,10 +1217,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	input = new Input();
 	input->Initialize(wc.hInstance, hwnd);
 
-	
+	keyboard->Acquire();
 
-	BYTE key[256]{};
-	BYTE prekey[256]{};
+	/*BYTE key[256]{};
+	keyboard->GetDeviceState(sizeof(key), key);
+	*/BYTE prekey[256]{};
+
+	input->Update();
 
 	MSG msg{};
 	//ウィンドウの×ボタンが押されるまでループ
@@ -1235,7 +1238,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		{
 
 			keyboard->Acquire();
-			memcpy(prekey, key, 256);
+			//memcpy(prekey, key, 256);
 			BYTE key[256] = {};
 			keyboard->GetDeviceState(sizeof(key), key);
 
