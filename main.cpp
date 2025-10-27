@@ -27,6 +27,8 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 #include<fstream>
 #include<sstream>
 
+#include "Input.h"
+
 struct Matrix4x4
 {
 	float m[4][4];
@@ -1202,6 +1204,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	indexDataSprite[0] = 0; indexDataSprite[1] = 1; indexDataSprite[2] = 2;
 	indexDataSprite[3] = 1; indexDataSprite[4] = 3; indexDataSprite[5] = 2;
 
+	hr = DirectInput8Create(wc.hInstance, DIRECTINPUT_VERSION,IID_IDirectInput8,(void**)&directInput, nullptr);
+
+	hr = directInput->CreateDevice(GUID_SysKeyboard, &keyboard, NULL);
+
+	hr = keyboard->SetDataFormat(&c_dfDIKeyboard);
+
+	hr = keyboard->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
+
+	Input* input = nullptr;
+
+	input = new Input();
+	input->Initialize(wc.hInstance, hwnd);
+
+	
+
 	BYTE key[256]{};
 	BYTE prekey[256]{};
 
@@ -1385,6 +1402,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 
+	delete input;
 
 	indexResourceSprite->Release();
 	transformationMatrixResourceSprite->Release();
