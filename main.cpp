@@ -1242,7 +1242,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			}
 
 			/*if (key[DIK_UP] || key[DIK_DOWN] || key[DIK_RIGHT] || key[DIK_LEFT]) {
-				if (key[DIK_UP]) { object3ds[0].position.y += 1.0f; }
+				if (key[DIK_UP]) { object3ds[0].position.y += 1.0f; } 
 				else if (key[DIK_DOWN]) { object3ds[0].position.y -= 1.0f; }
 				if (key[DIK_RIGHT]) { object3ds[0].position.x += 1.0f; }
 				else if (key[DIK_LEFT]) { object3ds[0].position.x -= 1.0f; }
