@@ -20,6 +20,8 @@ public:
 
 	HINSTANCE GetHInstance() const { return wc.hInstance; }
 
+	bool ProcessMessage();
+
 private:
 	HWND hwnd = nullptr;
 
