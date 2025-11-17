@@ -1347,6 +1347,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				break;
 			}
 		}
+		break;
 	}
 
 	//変数から型を推測する
