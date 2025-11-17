@@ -1190,9 +1190,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//Windowにメッセージが来てたら最優先で処理させる
 		if (winApp->ProcessMessage())
 		{
-			break;
-		} else
-		{
 
 			input->Update();
 
