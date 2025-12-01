@@ -13,60 +13,13 @@ void DirectXCommon::Initialize()
 	// メンバ変数に記録
 	this->winApp = winApp;
 
-	// デバッグレイヤーの有効化
-#ifdef _DEBUG
-	ID3D12Debug1* debugController = nullptr;
-	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
-		debugController->EnableDebugLayer();
-		debugController->SetEnableGPUBasedValidation(TRUE);
-	}
+	
 
-#endif // _DEBUG
+	
 
-	//DXGIファクトリーの作成
-	IDXGIFactory7* dxgiFactory = nullptr;
-	//HRESULTはWindows刑のエラーコードであり、
-	//関数が成功したかどうかSUCCEDEDマクロで判定できる
-	HRESULT hr = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory));
-	//初期化の根本的な部分でエラーが出た場合はプログラムが間違っているか、同化にもできない場合が多いのでassertにしておく
-	assert(SUCCEEDED(hr));
+	
 
-	//使用するアダプタ用の変数。最初にnullptrを入れておく
-	IDXGIAdapter4* useAdapter = nullptr;
-	for (UINT i = 0; dxgiFactory->EnumAdapterByGpuPreference(i, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&useAdapter)) !=
-		DXGI_ERROR_NOT_FOUND; ++i) {
-		//アダプタ情報を取得
-		DXGI_ADAPTER_DESC3 adapterDesc{};
-		hr = useAdapter->GetDesc3(&adapterDesc);
-		assert(SUCCEEDED(hr));//取得できないのは一大事
-		//ソフトアダプタウェアでなければ採用
-		if (!(adapterDesc.Flags & DXGI_ADAPTER_FLAG3_SOFTWARE)) {
-			//採用したアダプタ情報をログに出力
-			Log(ConverString(std::format(L"Use Adapater:{}\n", adapterDesc.Description)));
-			break;
-		}
-		useAdapter = nullptr;
-	}
-	assert(useAdapter != nullptr);
-
-	ID3D12Device* device = nullptr;
-	D3D_FEATURE_LEVEL featureLevels[] = {
-		D3D_FEATURE_LEVEL_12_2,D3D_FEATURE_LEVEL_12_1,D3D_FEATURE_LEVEL_12_0
-	};
-	const char* featureLevelStrings[] = { "12.2","12.1","12.0" };
-	for (size_t i = 0; i < _countof(featureLevels); ++i) {
-		hr = D3D12CreateDevice(useAdapter, featureLevels[i], IID_PPV_ARGS(&device));
-		if (SUCCEEDED(hr)) {
-			Log(std::format("FeatureLevel : {}\n", featureLevelStrings[i]));
-			break;
-		}
-	}
-	assert(device != nullptr);
-	Log("Compleate create D3D12Device!!!\n");
-
-	// ファクトリーの生成
-	// アダプターの選別
-	// デバイスの生成
+	
 
 	// エラーの設定
 
@@ -117,14 +70,96 @@ void DirectXCommon::Initialize()
 	assert(SUCCEEDED(hr));
 
 	// ディスクリプタヒープの生成
-
 	// 深度バッファの生成
+	//これから書き込むバックバッファのインデックスを取得
+	UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+
+	//TransitionBarrierの設定
+	D3D12_RESOURCE_BARRIER barrier{};
+
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	barrier.Transition.pResource = swapChainResources[backBufferIndex];
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	commandList->ResourceBarrier(1, &barrier);
+
+	//描画先のRTVを設定する
+	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, nullptr);
+	//指定した色で画面全体をクリアする
+	float clearColor[] = { 0.1f,0.25,0.5f,1.0f };
+	commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
 	// 深度バッファのテキスチャ生成
+	
 	// DSVの生成
 
 	// RTVの生成
 
 	// Fenceの生成
+}
+
+void DirectXCommon::DeviceController() {
+	HRESULT hr;
+
+	// デバッグレイヤーをオンに
+	// デバッグレイヤーの有効化
+#ifdef _DEBUG
+	ID3D12Debug1* debugController = nullptr;
+	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
+		debugController->EnableDebugLayer();
+		debugController->SetEnableGPUBasedValidation(TRUE);
+	}
+
+#endif // _DEBUG
+
+	// DXGIファクトリーの生成
+	// ファクトリーの生成
+	IDXGIFactory7* dxgiFactory = nullptr;
+	//HRESULTはWindows刑のエラーコードであり、
+	//関数が成功したかどうかSUCCEDEDマクロで判定できる
+	HRESULT hr = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory));
+	//初期化の根本的な部分でエラーが出た場合はプログラムが間違っているか、同化にもできない場合が多いのでassertにしておく
+	assert(SUCCEEDED(hr));
+
+	// アダプターの列挙
+	// アダプターの選別
+	//使用するアダプタ用の変数。最初にnullptrを入れておく
+	IDXGIAdapter4* useAdapter = nullptr;
+	for (UINT i = 0; dxgiFactory->EnumAdapterByGpuPreference(i, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&useAdapter)) !=
+		DXGI_ERROR_NOT_FOUND; ++i) {
+		//アダプタ情報を取得
+		DXGI_ADAPTER_DESC3 adapterDesc{};
+		hr = useAdapter->GetDesc3(&adapterDesc);
+		assert(SUCCEEDED(hr));//取得できないのは一大事
+		//ソフトアダプタウェアでなければ採用
+		if (!(adapterDesc.Flags & DXGI_ADAPTER_FLAG3_SOFTWARE)) {
+			//採用したアダプタ情報をログに出力
+			Log(ConverString(std::format(L"Use Adapater:{}\n", adapterDesc.Description)));
+			break;
+		}
+		useAdapter = nullptr;
+	}
+	assert(useAdapter != nullptr);
+
+	// デバイス生成
+	// デバイスの生成
+	ID3D12Device* device = nullptr;
+	D3D_FEATURE_LEVEL featureLevels[] = {
+		D3D_FEATURE_LEVEL_12_2,D3D_FEATURE_LEVEL_12_1,D3D_FEATURE_LEVEL_12_0
+	};
+	const char* featureLevelStrings[] = { "12.2","12.1","12.0" };
+	for (size_t i = 0; i < _countof(featureLevels); ++i) {
+		hr = D3D12CreateDevice(useAdapter, featureLevels[i], IID_PPV_ARGS(&device));
+		if (SUCCEEDED(hr)) {
+			Log(std::format("FeatureLevel : {}\n", featureLevelStrings[i]));
+			break;
+		}
+	}
+	assert(device != nullptr);
+	Log("Compleate create D3D12Device!!!\n");
+
+	// エラー時にブレークを発生させる設定
+
 }
 
 void DirectXCommon::PreDraw()

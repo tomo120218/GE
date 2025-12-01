@@ -12,6 +12,8 @@ public: // メンバ変数
 	void PreDraw();
 	// 描画完了
 	void PostDraw();
+
+	void DeviceController();
 private:
 	// DirectX12デバイス
 	Microsoft::WRL::ComPtr<ID3D12Device> device;

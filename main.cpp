@@ -1026,8 +1026,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));//書き込むためのアドレスを取得
 	std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData) * modelData.vertices.size());//頂点データをリソースにコピー
 
-
-
 	//マテリアル用のリソースを作る。今回はcolor1つ分のサイズを用意する
 	ID3D12Resource* materialResource = CreateBufferResource(device, sizeof(VertexData));
 	//マテリアルにデータを書き込む
@@ -1036,8 +1034,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
 	//今回は白を書き込んでみる
 	*materialData = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-
-
 
 	D3D12_VIEWPORT viewport{};
 
@@ -1053,9 +1049,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	scissorRect.right = WinApp::kClientWidth;
 	scissorRect.top = 0;
 	scissorRect.bottom = WinApp::kClientHeight;
-
-
-
 
 	//WVP用のリソースを作る。Matrix4x4 1つ分のサイズを用意する
 	ID3D12Resource* wvpResource = CreateBufferResource(device, sizeof(Matrix4x4));
@@ -1249,24 +1242,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		ImGui::Render();
 
-		//これから書き込むバックバッファのインデックスを取得
-		UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
-
-		//TransitionBarrierの設定
-		D3D12_RESOURCE_BARRIER barrier{};
-
-		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		barrier.Transition.pResource = swapChainResources[backBufferIndex];
-		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-		commandList->ResourceBarrier(1, &barrier);
-
-		//描画先のRTVを設定する
-		commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, nullptr);
-		//指定した色で画面全体をクリアする
-		float clearColor[] = { 0.1f,0.25,0.5f,1.0f };
-		commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
 
 		//描画先のRTVとDSVを設定する
 		D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
