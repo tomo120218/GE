@@ -14,11 +14,25 @@ public: // メンバ変数
 	void PostDraw();
 
 	void DeviceController();
+
+	void Command();
+
+	void SwapChain();
+
+	void DepthBufferResource();
+
+	void CreateDescriptorHeaps();
+
+	void // レンダーターゲットビューの初期化ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
+
 private:
 	// DirectX12デバイス
 	Microsoft::WRL::ComPtr<ID3D12Device> device;
 	// DXGIファクトリ
 	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory;
+
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(
+		D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 
 	// WindowsAPI
 	WinApp* winApp = nullptr;
