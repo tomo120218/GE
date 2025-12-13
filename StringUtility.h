@@ -1,7 +1,5 @@
 #pragma once
-class StringUtility
-{
-};
+#include <string>
 
 namespace StringUtility {
 	std::wstring ConvertString(const std::string& str);
