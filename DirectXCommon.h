@@ -4,6 +4,7 @@
 #include <wrl.h>
 #include "WinApp.h"
 #include <array>
+#include <dxcapi.h>
 
 using Microsoft::WRL::ComPtr;
 
@@ -11,7 +12,7 @@ class DirectXCommon
 {
 public: // メンバ変数
 	// 初期化
-	void Initialize();
+	void Initialize(WinApp* winApp);
 	// 描画開始
 	void PreDraw();
 	// 描画完了
@@ -28,8 +29,6 @@ public: // メンバ変数
 	void CreateDescriptorHeaps();
 
 	void CreateRTV();
-
-	D3D12_CPU_DESCRIPTOR_HANDLE GetRTVCPUDescriptorHandle(uint32_t index);
 
 	void CreateDSV();
 
@@ -48,28 +47,41 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Device> device;
 	// DXGIファクトリ
 	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory;
-
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(
-		D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
-
 	HRESULT hr;
 
 	//DepthStencilStateの設定
+	HANDLE fenceEvent{};
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
+	D3D12_RESOURCE_DESC resourceDesc{};
+	D3D12_HEAP_PROPERTIES heapProperties{};
+	D3D12_CLEAR_VALUE depthClearValue{};
+	D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc{};
+	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
+	D3D12_VIEWPORT viewport{};
+	D3D12_RESOURCE_BARRIER barrier{};
+	D3D12_RECT scissorRect{};
 	ID3D12Fence* fence = nullptr;
 	uint64_t fenceValue = 0;
 	ID3D12PipelineState* graphicsPipelineState = nullptr;
 	WinApp* winApp = nullptr;
-	ID3D12Device* device = nullptr;
 	ID3D12InfoQueue* infoQueue = nullptr;
 	ID3D12CommandAllocator* commandAllocator = nullptr;
 	ID3D12GraphicsCommandList* commandList = nullptr;
 	ID3D12CommandQueue* commandQueue = nullptr;
 	IDXGISwapChain4* swapChain = nullptr;
-	ID3D12Resource* swapChainResources[2] = { nullptr };
+	ID3D12Debug1* debugController = nullptr;
+	IDXGIAdapter4* useAdapter = nullptr;
+	ID3D12Resource* resource = nullptr;
+	ID3D12DescriptorHeap* descriptorHeap = nullptr;
+	IDxcUtils* dxcUtils = nullptr;
+	IDxcCompiler3* dxcCompiler = nullptr;
+	IDxcIncludeHandler* includeHandler = nullptr;
+
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
+	ID3D12CommandList* commandLists;
 
 	/// <summary>
 	/// 指定番号のCPUディスクリプタハンドルを取得する
@@ -103,7 +115,7 @@ private:
 	std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, 2> swapChainResources;
 
 	ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device, int32_t width, int32_t height);
-	ID3D12DescriptorHeap* CreateDescriptorHeap(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
+	ID3D12DescriptorHeap* CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 	ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap = nullptr;
 	ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap = nullptr;
 	ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap = nullptr;

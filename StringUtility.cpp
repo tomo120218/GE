@@ -17,7 +17,7 @@ namespace StringUtility {
 		return result;
 	}
 
-	std::string ConverString(const std::wstring& str) {
+	std::string ConvertString(const std::wstring& str) {
 		if (str.empty()) {
 			return std::string();
 		}
