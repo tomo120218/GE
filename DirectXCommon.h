@@ -127,5 +127,5 @@ private:
 	// getter
 	ID3D12Device* GetDevice() const { return device.Get(); }
 	ID3D12GraphicsCommandList* GetCommandList() const { return commandList.Get(); }
-	----------------------------------GE3 04-04 p7~
+	//----------------------------------GE3 04-04 p7~
 };

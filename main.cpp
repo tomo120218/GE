@@ -1197,7 +1197,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	// WindowsAPI解放
 	delete winApp;
-	winApp = nullptr;
+	//winApp = nullptr;
 
 	IDXGIDebug1* debug;
 	if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug)))) {
