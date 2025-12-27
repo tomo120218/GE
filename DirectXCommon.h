@@ -1,10 +1,10 @@
 #pragma once
-#include <d3d12.h>
-#include <dxgi1_6.h>
-#include <wrl.h>
 #include "WinApp.h"
 #include <array>
+#include <d3d12.h>
 #include <dxcapi.h>
+#include <dxgi1_6.h>
+#include <wrl.h>
 
 using Microsoft::WRL::ComPtr;
 
@@ -123,4 +123,9 @@ private:
 	uint32_t descriptorSizeRTV = 0;
 	uint32_t descriptorSizeDSV = 0;
 	uint32_t descriptorSizeSRV = 0;
+
+	// getter
+	ID3D12Device* GetDevice() const { return device.Get(); }
+	ID3D12GraphicsCommandList* GetCommandList() const { return commandList.Get(); }
+	----------------------------------GE3 04-04 p7~
 };
