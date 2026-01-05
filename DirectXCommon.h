@@ -64,25 +64,41 @@ private:
 	D3D12_VIEWPORT viewport{};
 	D3D12_RESOURCE_BARRIER barrier{};
 	D3D12_RECT scissorRect{};
-	ID3D12Fence* fence = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Fence> fence;
+	//ID3D12Fence* fence = nullptr;
 	uint64_t fenceValue = 0;
-	ID3D12PipelineState* graphicsPipelineState = nullptr;
-	WinApp* winApp = nullptr;
-	ID3D12InfoQueue* infoQueue = nullptr;
-	ID3D12CommandAllocator* commandAllocator = nullptr;
-	ID3D12GraphicsCommandList* commandList = nullptr;
-	ID3D12CommandQueue* commandQueue = nullptr;
-	IDXGISwapChain4* swapChain = nullptr;
-	ID3D12Debug1* debugController = nullptr;
-	IDXGIAdapter4* useAdapter = nullptr;
-	ID3D12Resource* resource = nullptr;
-	ID3D12DescriptorHeap* descriptorHeap = nullptr;
-	IDxcUtils* dxcUtils = nullptr;
-	IDxcCompiler3* dxcCompiler = nullptr;
-	IDxcIncludeHandler* includeHandler = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState;
+	//ID3D12PipelineState* graphicsPipelineState = nullptr;
+	Microsoft::WRL::ComPtr<WinApp> winApp;
+	//WinApp* winApp = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12InfoQueue> infoQueue;
+	//ID3D12InfoQueue* infoQueue = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator;
+	//ID3D12CommandAllocator* commandAllocator = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;
+	//ID3D12GraphicsCommandList* commandList = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
+	//ID3D12CommandQueue* commandQueue = nullptr;
+	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain;
+	//IDXGISwapChain4* swapChain = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Debug1> debugController;
+	//ID3D12Debug1* debugController = nullptr;
+	Microsoft::WRL::ComPtr<IDXGIAdapter4> useAdapter;
+	//IDXGIAdapter4* useAdapter = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> resource;
+	//ID3D12Resource* resource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>descriptorHeap;
+	//ID3D12DescriptorHeap* descriptorHeap = nullptr;
+	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils;
+	//IDxcUtils* dxcUtils = nullptr;
+	Microsoft::WRL::ComPtr<IDxcCompiler3>  dxcCompiler;
+	//IDxcCompiler3* dxcCompiler = nullptr;
+	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler;
+	//IDxcIncludeHandler* includeHandler = nullptr;
 
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
-	ID3D12CommandList* commandLists;
+	Microsoft::WRL::ComPtr< ID3D12CommandList> commandLists;
+	//ID3D12CommandList* commandLists;
 
 	/// <summary>
 	/// 指定番号のCPUディスクリプタハンドルを取得する
@@ -125,15 +141,15 @@ private:
 	uint32_t descriptorSizeDSV = 0;
 	uint32_t descriptorSizeSRV = 0;
 
-	//// getter
-	//ID3D12Device* GetDevice() const { return device.Get(); }
-	//ID3D12GraphicsCommandList* GetCommandList() const { return commandList.Get(); }
+	// getter
+	ID3D12Device* GetDevice() const { return device.Get(); }
+	ID3D12GraphicsCommandList* GetCommandList() const { return commandList.Get(); }
 
-	//// シェーダーコンパイル
-	//Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(
-	//	const std::wstring& filePath,
-	//	const wchar_t* profile
-	//);//------------------------------04-04p8完
+	// シェーダーコンパイル
+	Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(
+		const std::wstring& filePath,
+		const wchar_t* profile
+	);//------------------------------04-04p8完
 
 
 
