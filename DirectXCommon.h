@@ -5,6 +5,7 @@
 #include <dxcapi.h>
 #include <dxgi1_6.h>
 #include <wrl.h>
+#include <chrono>
 
 using Microsoft::WRL::ComPtr;
 
@@ -124,8 +125,24 @@ private:
 	uint32_t descriptorSizeDSV = 0;
 	uint32_t descriptorSizeSRV = 0;
 
-	// getter
-	ID3D12Device* GetDevice() const { return device.Get(); }
-	ID3D12GraphicsCommandList* GetCommandList() const { return commandList.Get(); }
-	//----------------------------------GE3 04-04 p7~
+	//// getter
+	//ID3D12Device* GetDevice() const { return device.Get(); }
+	//ID3D12GraphicsCommandList* GetCommandList() const { return commandList.Get(); }
+
+	//// シェーダーコンパイル
+	//Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(
+	//	const std::wstring& filePath,
+	//	const wchar_t* profile
+	//);//------------------------------04-04p8完
+
+
+
+	// FPS固定初期化
+	void InitializeFixFPS();
+
+	// FPS固定更新
+	void UpdateFixFPS();
+
+	// 記録時間(FPS固定用)
+	std::chrono::steady_clock::time_point reference_;
 };
