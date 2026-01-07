@@ -179,7 +179,7 @@ void DirectXCommon::SwapChain() {
 		&swapChainDesc,
 		nullptr,
 		nullptr,
-		reinterpret_cast<IDXGISwapChain1**>(&swapChain));
+		reinterpret_cast<IDXGISwapChain1**>(swapChain.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 
 }

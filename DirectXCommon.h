@@ -69,8 +69,7 @@ private:
 	uint64_t fenceValue = 0;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState;
 	//ID3D12PipelineState* graphicsPipelineState = nullptr;
-	Microsoft::WRL::ComPtr<WinApp> winApp;
-	//WinApp* winApp = nullptr;
+	WinApp* winApp = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12InfoQueue> infoQueue;
 	//ID3D12InfoQueue* infoQueue = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator;
