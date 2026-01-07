@@ -127,6 +127,16 @@ private:
 	/// </summary>
 	D3D12_GPU_DESCRIPTOR_HANDLE GetSRVGPUDescriptorHandle(uint32_t index);
 
+	/// <summary>
+	/// バッファリソースの生成
+	/// </summary>
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizzeInBytes);
+
+	/// <summary>
+	/// テクスチャリソースの生成
+	/// </summary>
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(const DirectX::TexMetadata& metadata);
+
 	// スワップチェーンリソース
 	std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, 2> swapChainResources;
 
@@ -136,6 +146,12 @@ private:
 	ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap = nullptr;
 	ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap = nullptr;
 	ComPtr<ID3D12Resource> depthStencilResource = nullptr;
+	ComPtr<IDxcBlobEncoding> shaderSource = nullptr;
+	ComPtr<IDxcResult> shaderResult = nullptr;
+	ComPtr<IDxcBlobUtf8> shaderError = nullptr;	
+	ComPtr<IDxcBlob> shaderBlob = nullptr;
+	ComPtr<ID3D12Resource> vertexResouce = nullptr;
+	ComPtr<ID3D12Resource> resource = nullptr;
 	uint32_t descriptorSizeRTV = 0;
 	uint32_t descriptorSizeDSV = 0;
 	uint32_t descriptorSizeSRV = 0;
@@ -148,8 +164,7 @@ private:
 	Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(
 		const std::wstring& filePath,
 		const wchar_t* profile
-	);//------------------------------04-04p8完
-
+	);
 
 
 	// FPS固定初期化

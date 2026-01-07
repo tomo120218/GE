@@ -510,21 +510,16 @@ void DirectXCommon::InitializeFixFPS() {
 	reference_ = std::chrono::steady_clock::now();
 }
 
-Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring& filePath, const wchar_t* profile)
-{
-	return Microsoft::WRL::ComPtr<IDxcBlob>();
-}
-
-IDxcBlob* CompileShader(
+Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::CompileShader(
 	const std::wstring& filePath,
-	const wchar_t* profile,
-	IDxcUtils* dxcUtils,
+	const wchar_t* profile
+	/*IDxcUtils* dxcUtils,
 	IDxcCompiler3* dxcCompiler,
-	IDxcIncludeHandler* includeHandler
+	IDxcIncludeHandler* includeHandler*/
 )
 {
-	//Log(ConverString(std::format(L"Begin CompliteShader,path:{},profile:{}\n", filePath, profile)));
-	IDxcBlobEncoding* shaderSource = nullptr;
+	Logger::Log(ConvertString(std::format(L"Begin CompliteShader,path:{},profile:{}\n", filePath, profile)));
+	Microsoft::WRL::ComPtr<IDxcBlobEncoding> shaderSource = nullptr;
 	HRESULT hr = dxcUtils->LoadFile(filePath.c_str(), nullptr, &shaderSource);
 	assert(SUCCEEDED(hr));
 	DxcBuffer shaderSourceBuffer;
@@ -540,29 +535,92 @@ IDxcBlob* CompileShader(
 		L"-Od",
 		L"-Zpr",
 	};
-	IDxcResult* shaderResult = nullptr;
+	Microsoft::WRL::ComPtr<IDxcResult> shaderResult = nullptr;
 	hr = dxcCompiler->Compile(
 		&shaderSourceBuffer,
 		arguments,
 		_countof(arguments),
-		includeHandler,
+		includeHandler.Get(),
 		IID_PPV_ARGS(&shaderResult)
 	);
 	assert(SUCCEEDED(hr));
 
-	IDxcBlobUtf8* shaderError = nullptr;
+	Microsoft::WRL::ComPtr<IDxcBlobUtf8> shaderError = nullptr;
 	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
 	if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
 		//Log(shaderError->GetStringPointer());
 		assert(false);
 	}
 
-	IDxcBlob* shaderBlob = nullptr;
+	Microsoft::WRL::ComPtr<IDxcBlob> shaderBlob = nullptr;
 	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
 	assert(SUCCEEDED(hr));
-	//Log(ConverString(std::format(L"Compile Succeded, path:{}, profile:{}\n", filePath, profile)));
+	Logger::Log(ConvertString(std::format(L"Compile Succeded, path:{}, profile:{}\n", filePath, profile)));
 	shaderSource->Release();
 	shaderResult->Release();
 	return shaderBlob;
 
 }
+
+Microsoft::WRL::ComPtr<ID3D12Resource> DirectXCommon::CreateBufferResource(size_t sizeInBytes) {
+
+		//頂点リソース用のヒープの設定
+		D3D12_HEAP_PROPERTIES uploadHeapProperties{};
+		uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
+		//頂点リソースの設定
+		D3D12_RESOURCE_DESC vertexResourceDesc{};
+		//バッファリソース。テクスチャの場合はまた別の設定をする
+		vertexResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+		vertexResourceDesc.Width = sizeInBytes;//リソースのサイズ。もらったを使用
+		//バッファの場合はこれらは1にする決まり
+		vertexResourceDesc.Height = 1;
+		vertexResourceDesc.DepthOrArraySize = 1;
+		vertexResourceDesc.MipLevels = 1;
+		vertexResourceDesc.SampleDesc.Count = 1;
+		//バッファの場合はこれにする決まり
+		vertexResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+		//実際に頂点リソースを作る
+		Microsoft::WRL::ComPtr<ID3D12Resource> vertexResouce = nullptr;
+		HRESULT hr = device->CreateCommittedResource(
+			&uploadHeapProperties,
+			D3D12_HEAP_FLAG_NONE,
+			&vertexResourceDesc,
+			D3D12_RESOURCE_STATE_GENERIC_READ,
+			nullptr,
+			IID_PPV_ARGS(&vertexResouce));
+		assert(SUCCEEDED(hr));
+
+		return vertexResouce;
+}
+
+Microsoft::WRL::ComPtr<ID3D12Resource> DirectXCommon::CreateTextureResource(const DirectX::TexMetadata& metadata)
+{
+	//metadataを基にResourceの設定
+	D3D12_RESOURCE_DESC resourceDesc{};
+	resourceDesc.Width = UINT(metadata.width);//Textureの幅
+	resourceDesc.Height = UINT(metadata.height);//Textureの高さ
+	resourceDesc.MipLevels = UINT16(metadata.mipLevels);//mipmapの数
+	resourceDesc.DepthOrArraySize = UINT16(metadata.arraySize);//奥行き　or　配列Textureの配列数
+	resourceDesc.Format = metadata.format;//TextureのFormat
+	resourceDesc.SampleDesc.Count = 1;//サンプリングカウント。1固定.
+	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION(metadata.dimension);//Textureの次元数。普段使っているのは2次元
+
+	//利用するHeapの設定
+	D3D12_HEAP_PROPERTIES heapProperties{};
+	heapProperties.Type = D3D12_HEAP_TYPE_CUSTOM;//細かい設定を行う
+	heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;//WriteBackポリシーでCPUアクセス可能
+	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;//プロセッサの近くに配置
+
+	//Resouceを生成する
+	Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
+	HRESULT hr = device->CreateCommittedResource(
+		&heapProperties,//Heapの設定
+		D3D12_HEAP_FLAG_NONE,//Heapの特殊な設定
+		&resourceDesc,//Resourceの設定
+		D3D12_RESOURCE_STATE_GENERIC_READ,//初回のResourceState。Textureは基本読むだけ
+		nullptr,//Clear最適値。使わないのでnullptr
+		IID_PPV_ARGS(&resource));//作成するResourceポインタへのポインタ
+	assert(SUCCEEDED(hr));
+	return resource;
+}
+//----------------------------------GE-04-04p10

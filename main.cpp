@@ -467,37 +467,37 @@ DirectX::ScratchImage LoadTexture(const std::string& filePath)
 }
 
 //DirectX12のTextureResourceを作る
-ID3D12Resource* CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata)
-{
-	//metadataを基にResourceの設定
-	D3D12_RESOURCE_DESC resourceDesc{};
-	resourceDesc.Width = UINT(metadata.width);//Textureの幅
-	resourceDesc.Height = UINT(metadata.height);//Textureの高さ
-	resourceDesc.MipLevels = UINT16(metadata.mipLevels);//mipmapの数
-	resourceDesc.DepthOrArraySize = UINT16(metadata.arraySize);//奥行き　or　配列Textureの配列数
-	resourceDesc.Format = metadata.format;//TextureのFormat
-	resourceDesc.SampleDesc.Count = 1;//サンプリングカウント。1固定.
-	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION(metadata.dimension);//Textureの次元数。普段使っているのは2次元
-
-	//利用するHeapの設定
-	D3D12_HEAP_PROPERTIES heapProperties{};
-	heapProperties.Type = D3D12_HEAP_TYPE_CUSTOM;//細かい設定を行う
-	heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;//WriteBackポリシーでCPUアクセス可能
-	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;//プロセッサの近くに配置
-
-	//Resouceを生成する
-	ID3D12Resource* resource = nullptr;
-	HRESULT hr = device->CreateCommittedResource(
-		&heapProperties,//Heapの設定
-		D3D12_HEAP_FLAG_NONE,//Heapの特殊な設定
-		&resourceDesc,//Resourceの設定
-		D3D12_RESOURCE_STATE_GENERIC_READ,//初回のResourceState。Textureは基本読むだけ
-		nullptr,//Clear最適値。使わないのでnullptr
-		IID_PPV_ARGS(&resource));//作成するResourceポインタへのポインタ
-	assert(SUCCEEDED(hr));
-	return resource;
-
-}
+//ID3D12Resource* CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata)
+//{
+//	//metadataを基にResourceの設定
+//	D3D12_RESOURCE_DESC resourceDesc{};
+//	resourceDesc.Width = UINT(metadata.width);//Textureの幅
+//	resourceDesc.Height = UINT(metadata.height);//Textureの高さ
+//	resourceDesc.MipLevels = UINT16(metadata.mipLevels);//mipmapの数
+//	resourceDesc.DepthOrArraySize = UINT16(metadata.arraySize);//奥行き　or　配列Textureの配列数
+//	resourceDesc.Format = metadata.format;//TextureのFormat
+//	resourceDesc.SampleDesc.Count = 1;//サンプリングカウント。1固定.
+//	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION(metadata.dimension);//Textureの次元数。普段使っているのは2次元
+//
+//	//利用するHeapの設定
+//	D3D12_HEAP_PROPERTIES heapProperties{};
+//	heapProperties.Type = D3D12_HEAP_TYPE_CUSTOM;//細かい設定を行う
+//	heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;//WriteBackポリシーでCPUアクセス可能
+//	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;//プロセッサの近くに配置
+//
+//	//Resouceを生成する
+//	ID3D12Resource* resource = nullptr;
+//	HRESULT hr = device->CreateCommittedResource(
+//		&heapProperties,//Heapの設定
+//		D3D12_HEAP_FLAG_NONE,//Heapの特殊な設定
+//		&resourceDesc,//Resourceの設定
+//		D3D12_RESOURCE_STATE_GENERIC_READ,//初回のResourceState。Textureは基本読むだけ
+//		nullptr,//Clear最適値。使わないのでnullptr
+//		IID_PPV_ARGS(&resource));//作成するResourceポインタへのポインタ
+//	assert(SUCCEEDED(hr));
+//	return resource;
+//
+//}
 
 //TextureResourceにデータを転送する
 void UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages)
@@ -521,30 +521,30 @@ void UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mip
 	}
 }
 
-ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInBytes)
-{
-	//頂点リソース用のヒープの設定
-	D3D12_HEAP_PROPERTIES uploadHeapProperties{};
-	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
-	//頂点リソースの設定
-	D3D12_RESOURCE_DESC vertexResourceDesc{};
-	//バッファリソース。テクスチャの場合はまた別の設定をする
-	vertexResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-	vertexResourceDesc.Width = sizeInBytes;//リソースのサイズ。もらったを使用
-	//バッファの場合はこれらは1にする決まり
-	vertexResourceDesc.Height = 1;
-	vertexResourceDesc.DepthOrArraySize = 1;
-	vertexResourceDesc.MipLevels = 1;
-	vertexResourceDesc.SampleDesc.Count = 1;
-	//バッファの場合はこれにする決まり
-	vertexResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-	//実際に頂点リソースを作る
-	ID3D12Resource* vertexResouce = nullptr;
-	HRESULT hr = device->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &vertexResourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&vertexResouce));
-	assert(SUCCEEDED(hr));
-
-	return vertexResouce;
-}
+//ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInBytes)
+//{
+//	//頂点リソース用のヒープの設定
+//	D3D12_HEAP_PROPERTIES uploadHeapProperties{};
+//	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
+//	//頂点リソースの設定
+//	D3D12_RESOURCE_DESC vertexResourceDesc{};
+//	//バッファリソース。テクスチャの場合はまた別の設定をする
+//	vertexResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+//	vertexResourceDesc.Width = sizeInBytes;//リソースのサイズ。もらったを使用
+//	//バッファの場合はこれらは1にする決まり
+//	vertexResourceDesc.Height = 1;
+//	vertexResourceDesc.DepthOrArraySize = 1;
+//	vertexResourceDesc.MipLevels = 1;
+//	vertexResourceDesc.SampleDesc.Count = 1;
+//	//バッファの場合はこれにする決まり
+//	vertexResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+//	//実際に頂点リソースを作る
+//	ID3D12Resource* vertexResouce = nullptr;
+//	HRESULT hr = device->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &vertexResourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&vertexResouce));
+//	assert(SUCCEEDED(hr));
+//
+//	return vertexResouce;
+//}
 
 
 
