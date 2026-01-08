@@ -7,6 +7,8 @@
 #include <wrl.h>
 #include <chrono>
 
+#include "externals/DirectXTex/DirectXTex.h"
+
 using Microsoft::WRL::ComPtr;
 
 class DirectXCommon
@@ -65,38 +67,33 @@ private:
 	D3D12_RESOURCE_BARRIER barrier{};
 	D3D12_RECT scissorRect{};
 	Microsoft::WRL::ComPtr<ID3D12Fence> fence;
-	//ID3D12Fence* fence = nullptr;
 	uint64_t fenceValue = 0;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState;
-	//ID3D12PipelineState* graphicsPipelineState = nullptr;
 	WinApp* winApp = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12InfoQueue> infoQueue;
-	//ID3D12InfoQueue* infoQueue = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator;
-	//ID3D12CommandAllocator* commandAllocator = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;
-	//ID3D12GraphicsCommandList* commandList = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
-	//ID3D12CommandQueue* commandQueue = nullptr;
 	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain;
-	//IDXGISwapChain4* swapChain = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Debug1> debugController;
-	//ID3D12Debug1* debugController = nullptr;
 	Microsoft::WRL::ComPtr<IDXGIAdapter4> useAdapter;
-	//IDXGIAdapter4* useAdapter = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> resource;
-	//ID3D12Resource* resource = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>descriptorHeap;
-	//ID3D12DescriptorHeap* descriptorHeap = nullptr;
 	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils;
-	//IDxcUtils* dxcUtils = nullptr;
 	Microsoft::WRL::ComPtr<IDxcCompiler3>  dxcCompiler;
-	//IDxcCompiler3* dxcCompiler = nullptr;
 	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler;
-	//IDxcIncludeHandler* includeHandler = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap;
+	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource;
+	Microsoft::WRL::ComPtr<IDxcBlobEncoding> shaderSource;
+	Microsoft::WRL::ComPtr<IDxcResult> shaderResultr;
+	Microsoft::WRL::ComPtr<IDxcBlobUtf8> shaderError;
+	Microsoft::WRL::ComPtr<IDxcBlob> shaderBlob;
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResouce;
 
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
-	Microsoft::WRL::ComPtr< ID3D12CommandList> commandLists;
+	Microsoft::WRL::ComPtr<ID3D12CommandList> commandLists;
 	//ID3D12CommandList* commandLists;
 
 	/// <summary>
@@ -137,21 +134,23 @@ private:
 	/// </summary>
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(const DirectX::TexMetadata& metadata);
 
+	/// <summary>
+	/// テクスチャデータの転送
+	/// </summary>
+	void UpLoadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>& texture, const DirectX::ScratchImage& mipImages);
+
+	/// <summary>
+	/// テクスチャファイルの読み込み
+	/// </summary>
+	/// <param name* "filePath">テキスチャファイルのパス</param>
+	/// <returns>画像イメージデータ</returns>
+	static DirectX::ScratchImage LoadTexture(const std::string& filePath);
+
 	// スワップチェーンリソース
 	std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, 2> swapChainResources;
 
 	ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device, int32_t width, int32_t height);
-	ID3D12DescriptorHeap* CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
-	ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap = nullptr;
-	ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap = nullptr;
-	ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap = nullptr;
-	ComPtr<ID3D12Resource> depthStencilResource = nullptr;
-	ComPtr<IDxcBlobEncoding> shaderSource = nullptr;
-	ComPtr<IDxcResult> shaderResult = nullptr;
-	ComPtr<IDxcBlobUtf8> shaderError = nullptr;	
-	ComPtr<IDxcBlob> shaderBlob = nullptr;
-	ComPtr<ID3D12Resource> vertexResouce = nullptr;
-	ComPtr<ID3D12Resource> resource = nullptr;
+	ID3D12DescriptorHeap* CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);	
 	uint32_t descriptorSizeRTV = 0;
 	uint32_t descriptorSizeDSV = 0;
 	uint32_t descriptorSizeSRV = 0;
