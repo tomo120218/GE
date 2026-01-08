@@ -1058,14 +1058,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 		//ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
-
-
-		
-		
-
-		
-
-		
+				
 		//hr = commandList->Reset(commandAllocator, nullptr);
 		//assert(SUCCEEDED(hr));
 
