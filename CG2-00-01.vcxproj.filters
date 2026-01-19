@@ -16,6 +16,33 @@
     <Filter Include="imgui">
       <UniqueIdentifier>{7bf2d2e1-4fcb-452e-8a38-7f750f36b141}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\engine">
+      <UniqueIdentifier>{303d4865-5b52-44ab-8f31-d623e32d9c89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\engine\2d">
+      <UniqueIdentifier>{f53b38af-17ac-498e-a1a0-6920d197f23f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\engine\3d">
+      <UniqueIdentifier>{d7db4168-d3cc-4a8f-8654-72dd8e8d8954}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\engine\base">
+      <UniqueIdentifier>{6e2b992b-09f1-4172-a365-05f11dcad973}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\engine\math">
+      <UniqueIdentifier>{a579354a-4a0a-4860-9023-b571140d7842}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\engine\io">
+      <UniqueIdentifier>{17bd0e17-3105-4c09-8129-df149b7a66cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\engine\audio">
+      <UniqueIdentifier>{cee7e996-0c4c-431c-b101-bb87ffc01005}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\engine\scene">
+      <UniqueIdentifier>{4ba9b1e2-5b01-4d8d-abd4-027bf8721fc0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\application">
+      <UniqueIdentifier>{3eb54933-1947-449f-9c69-5459417cecee}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -55,6 +82,9 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="StringUtility.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="D3DResourceLeakChecker.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -100,6 +130,9 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="StringUtility.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="D3DResourceLeakChecker.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
