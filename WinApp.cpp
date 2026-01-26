@@ -1,3 +1,4 @@
+#pragma comment(lib, "winmm.lib")
 #include "WinApp.h"
 #include <Windows.h>
 #include "externals/imgui/imgui.h"
@@ -42,6 +43,9 @@ void WinApp::Initialize()
 
 	//ウィンドウを表示する
 	ShowWindow(hwnd, SW_SHOW);
+
+	// システムタイマーの分解能をあげる
+	timeBeginPeriod(1);
 }
 
 void WinApp::Update()
