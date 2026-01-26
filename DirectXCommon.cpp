@@ -66,6 +66,7 @@ void DirectXCommon::DeviceController() {
 	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
 		debugController->EnableDebugLayer();
 		debugController->SetEnableGPUBasedValidation(TRUE);
+		//debugController->Release();
 	}
 
 #endif // _DEBUG
@@ -114,7 +115,7 @@ void DirectXCommon::DeviceController() {
 
 	// エラー時にブレークを発生させる設定
 #ifdef _DEBUG
-
+	Microsoft::WRL::ComPtr<ID3D12InfoQueue> infoQueue;
 	if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&infoQueue)))) {
 		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
 
@@ -134,7 +135,7 @@ void DirectXCommon::DeviceController() {
 		filter.DenyList.pSeverityList = severities;
 
 		infoQueue->PushStorageFilter(&filter);
-		infoQueue->Release();
+		//infoQueue->Release();
 	}
 
 #endif // _DEBUG
@@ -184,8 +185,10 @@ void DirectXCommon::SwapChain() {
 
 }
 
-ID3D12Resource* DirectXCommon::CreateDepthStencilTextureResource(ID3D12Device* device, int32_t width, int32_t height)
+ComPtr<ID3D12Resource> DirectXCommon::CreateDepthStencilTextureResource(ID3D12Device* device, int32_t width, int32_t height)
 {
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> resource;
 	//生成するResourceの設定
 	resourceDesc.Width = width;//Textureの幅
 	resourceDesc.Height = height;//Textureの高さ
@@ -213,7 +216,7 @@ ID3D12Resource* DirectXCommon::CreateDepthStencilTextureResource(ID3D12Device* d
 		IID_PPV_ARGS(&resource));
 	assert(SUCCEEDED(hr));
 
-	return resource.Get();
+	return resource;
 
 }
 
@@ -225,14 +228,15 @@ void DirectXCommon::DepthBufferResource() {
 	depthStencilResource = CreateDepthStencilTextureResource(device.Get(), WinApp::kClientWidth, WinApp::kClientHeight);
 }
 
-ID3D12DescriptorHeap* DirectXCommon::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible)
+ComPtr<ID3D12DescriptorHeap> DirectXCommon::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible)
 {
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>descriptorHeap;
 	descriptorHeapDesc.Type = heapType;
 	descriptorHeapDesc.NumDescriptors = numDescriptors;
 	descriptorHeapDesc.Flags = shaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 	HRESULT hr = device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&descriptorHeap));
 	assert(SUCCEEDED(hr));
-	return descriptorHeap.Get();
+	return descriptorHeap;
 }
 
 void DirectXCommon::CreateRTV() {
@@ -515,14 +519,14 @@ void DirectXCommon::InitializeFixFPS() {
 	reference_ = std::chrono::steady_clock::now();
 }
 
-Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::CompileShader(
-	const std::wstring& filePath,
-	const wchar_t* profile
-	/*IDxcUtils* dxcUtils,
-	IDxcCompiler3* dxcCompiler,
-	IDxcIncludeHandler* includeHandler*/
-)
+Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring& filePath, const wchar_t* profile)
 {
+
+	Microsoft::WRL::ComPtr<IDxcBlob> shaderBlob;
+	Microsoft::WRL::ComPtr<IDxcBlobUtf8> shaderError;
+	Microsoft::WRL::ComPtr<IDxcResult> shaderResult;
+
+
 	Logger::Log(ConvertString(std::format(L"Begin CompliteShader,path:{},profile:{}\n", filePath, profile)));
 	Microsoft::WRL::ComPtr<IDxcBlobEncoding> shaderSource = nullptr;
 	HRESULT hr = dxcUtils->LoadFile(filePath.c_str(), nullptr, &shaderSource);
@@ -540,7 +544,6 @@ Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::CompileShader(
 		L"-Od",
 		L"-Zpr",
 	};
-	Microsoft::WRL::ComPtr<IDxcResult> shaderResult = nullptr;
 	hr = dxcCompiler->Compile(
 		&shaderSourceBuffer,
 		arguments,
@@ -550,25 +553,24 @@ Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::CompileShader(
 	);
 	assert(SUCCEEDED(hr));
 
-	Microsoft::WRL::ComPtr<IDxcBlobUtf8> shaderError = nullptr;
 	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
 	if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
 		//Log(shaderError->GetStringPointer());
 		assert(false);
 	}
 
-	Microsoft::WRL::ComPtr<IDxcBlob> shaderBlob = nullptr;
 	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
 	assert(SUCCEEDED(hr));
 	Logger::Log(ConvertString(std::format(L"Compile Succeded, path:{}, profile:{}\n", filePath, profile)));
-	shaderSource->Release();
-	shaderResult->Release();
+	/*shaderSource->Release();
+	shaderResult->Release();*/
 	return shaderBlob;
 
 }
 
 Microsoft::WRL::ComPtr<ID3D12Resource> DirectXCommon::CreateBufferResource(size_t sizeInBytes) {
 
+	Microsoft::WRL::ComPtr<ID3D12Resource> resource;
 	//頂点リソース用のヒープの設定
 	D3D12_HEAP_PROPERTIES uploadHeapProperties{};
 	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;

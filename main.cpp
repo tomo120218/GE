@@ -651,6 +651,7 @@ std::string ConvertString(const std::wstring& str) {
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
+	D3DResourceLeakChecker leakCheck;
 	//CoInitializeEx(0, COINIT_MULTITHREADED);
 
 	// ポインタ
@@ -707,18 +708,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	descriptionRootSignature.pStaticSamplers = staticSamplers;
 	descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
 
-	ID3DBlob* signatureBlob = nullptr;
-	ID3DBlob* errorBlob = nullptr;
+	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob = nullptr;
+	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
 	HRESULT hr = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
 	if (FAILED(hr)) {
 		Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
 		assert(false);
 	}
-	ID3D12RootSignature* rootSignature = nullptr;
-	
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature = nullptr;
+
 	hr = dxCommon->GetDevice()->CreateRootSignature(
 		0,
-		signatureBlob->GetBufferPointer(), 
+		signatureBlob->GetBufferPointer(),
 		signatureBlob->GetBufferSize(),
 		IID_PPV_ARGS(&rootSignature));
 	assert(SUCCEEDED(hr));
@@ -756,7 +757,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	assert(pixelShaderBlob != nullptr);
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
-	graphicsPipelineStateDesc.pRootSignature = rootSignature;
+	graphicsPipelineStateDesc.pRootSignature = rootSignature.Get();
 	graphicsPipelineStateDesc.InputLayout = inputLayOutDesc;
 	graphicsPipelineStateDesc.VS = { vertexShaderBlob->GetBufferPointer(),vertexShaderBlob->GetBufferSize() };
 	graphicsPipelineStateDesc.PS = { pixelShaderBlob->GetBufferPointer(),pixelShaderBlob->GetBufferSize() };
@@ -793,7 +794,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
 	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
-	ID3D12PipelineState* graphicsPipelineState = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState = nullptr;
 	hr = dxCommon->GetDevice()->CreateGraphicsPipelineState(
 		&graphicsPipelineStateDesc,
 		IID_PPV_ARGS(&graphicsPipelineState));
@@ -828,7 +829,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//右下
 	vertexData[5].position = { 0.5f,-0.5f,-0.5f,1.0f };
 	vertexData[5].texcoord = { 1.0f,1.0f };
-	
+
 
 	// モデル読み込み
 	ModelData modelData = LoadObjFile("resources", "plane.obj");
@@ -857,9 +858,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//今回は白を書き込んでみる
 	*materialData = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 
-	
 
-	
+
+
 
 	//WVP用のリソースを作る。Matrix4x4 1つ分のサイズを用意する
 	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource = dxCommon->CreateBufferResource(/*device,*/ sizeof(Matrix4x4));
@@ -873,8 +874,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//Transform変数を作る
 	Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 
-    Transform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-5.0f} };
-	
+	Transform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-5.0f} };
+
 	//ImGui_ImplDX12_Init(device, swapChainDesc.BufferCount, rtvDesc.Format, srvDescriptorHeap, srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 
 	//Textureを読んで転送する
@@ -954,7 +955,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	indexBufferViewSprite.Format = DXGI_FORMAT_R32_UINT;
 
 	//インデックスリソースにデータを書き込む
-    uint32_t* indexDataSprite = nullptr;
+	uint32_t* indexDataSprite = nullptr;
 	indexResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&indexDataSprite));
 	indexDataSprite[0] = 0; indexDataSprite[1] = 1; indexDataSprite[2] = 2;
 	indexDataSprite[3] = 1; indexDataSprite[4] = 3; indexDataSprite[5] = 2;
@@ -1032,12 +1033,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//描画先のRTVを設定する
 		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList = nullptr;
 		//commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, nullptr);
-		
+
 		dxCommon->PreDraw();
-		
-		
-		dxCommon->GetCommandList()->SetGraphicsRootSignature(rootSignature);
-		dxCommon->GetCommandList()->SetPipelineState(graphicsPipelineState);
+
+
+		dxCommon->GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
+		dxCommon->GetCommandList()->SetPipelineState(graphicsPipelineState.Get());
+
 		dxCommon->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);
 		dxCommon->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		//マテリアルCBufferの場所を設定
@@ -1047,8 +1049,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//SRVのDexcriptorTableの先頭を設定。2はrootParameter[2]である。
 		//dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
 		dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
+		//モデル描画
+		dxCommon->GetCommandList()->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
 
-		dxCommon->GetCommandList()->DrawInstanced(6, 1, 0, 0);
 
 		//Spriteの描画。変更が必要なものだけ変更する
 		dxCommon->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);//VBVを設定
@@ -1059,10 +1062,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		//描画！(DrawCall/ドローコール)6個のインデックスを使用し1つのインスタンスを描画。その他当面0で良い
 		dxCommon->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
-
-		//モデル描画
-		dxCommon->GetCommandList()->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
-
 
 		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), dxCommon->GetCommandList());
 
@@ -1080,7 +1079,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 	//変数から型を推測する
-    Log(ConvertString(std::format(L"WSTRING{}\n", L"abc")));
+	Log(ConvertString(std::format(L"WSTRING{}\n", L"abc")));
 
 
 
@@ -1097,8 +1096,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	ImGui::DestroyContext();
 
 	delete input;
-	// DirectX解放
-	delete dxCommon;
+	//// DirectX解放
+	//delete dxCommon;
 
 	/*indexResourceSprite->Release();
 	transformationMatrixResourceSprite->Release();
@@ -1141,24 +1140,24 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	winApp->Finalize();
 
 	// WindowsAPI解放
-	delete winApp;
 	delete dxCommon;
+	delete winApp;
 	winApp = nullptr;
 
-	/*IDXGIDebug1* debug;
-	if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug)))) {
-		debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
-		debug->ReportLiveObjects(DXGI_DEBUG_APP, DXGI_DEBUG_RLO_ALL);
-		debug->ReportLiveObjects(DXGI_DEBUG_D3D12, DXGI_DEBUG_RLO_ALL);
-		debug->Release();
-	}*/
-	
+	//IDXGIDebug1* debug;
+	//if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug)))) {
+	//	/*debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
+	//	debug->ReportLiveObjects(DXGI_DEBUG_APP, DXGI_DEBUG_RLO_ALL);
+	//	debug->ReportLiveObjects(DXGI_DEBUG_D3D12, DXGI_DEBUG_RLO_ALL);
+	//	debug->Release();*/
+	//}
+
 	/*IDXGIDebug1* debug = nullptr;
 	if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug)))) {
 		debug->ReportLiveObjects(DXGI_DEBUG_APP, DXGI_DEBUG_RLO_SUMMARY);
 		debug->Release();
 	}*/
-	CoUninitialize();
+	//CoUninitialize();
 
 	return 0;
 }

@@ -99,7 +99,7 @@ public: // メンバ変数
 	ID3D12Device* GetDevice() const { return device.Get(); }
 	ID3D12GraphicsCommandList* GetCommandList() const { return commandList.Get(); }
 
-	
+
 	// シェーダーコンパイル
 	Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(
 		const std::wstring& filePath,
@@ -130,16 +130,12 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Fence> fence;
 	uint64_t fenceValue = 0;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState;
-	WinApp* winApp = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12InfoQueue> infoQueue;
 	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator;
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
 	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain;
 	Microsoft::WRL::ComPtr<ID3D12Debug1> debugController;
 	Microsoft::WRL::ComPtr<IDXGIAdapter4> useAdapter;
-	Microsoft::WRL::ComPtr<ID3D12Resource> resource;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>descriptorHeap;
 	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils;
 	Microsoft::WRL::ComPtr<IDxcCompiler3>  dxcCompiler;
 	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler;
@@ -148,28 +144,25 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap;
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource;
 	Microsoft::WRL::ComPtr<IDxcBlobEncoding> shaderSource;
-	Microsoft::WRL::ComPtr<IDxcResult> shaderResultr;
-	Microsoft::WRL::ComPtr<IDxcBlobUtf8> shaderError;
-	Microsoft::WRL::ComPtr<IDxcBlob> shaderBlob;
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResouce;
+
+	WinApp* winApp = nullptr;
+
 
 	// いるのかわからん
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource;
 	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource;
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceSprite;
+	/*Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceSprite;
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourceSprite;
-	Microsoft::WRL::ComPtr<ID3D12Resource> indexResourceSprite;
+	Microsoft::WRL::ComPtr<ID3D12Resource> indexResourceSprite;*/
 
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
-	Microsoft::WRL::ComPtr<ID3D12CommandList> commandLists;
-	//ID3D12CommandList* commandLists;
-
 
 	// スワップチェーンリソース
 	std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, 2> swapChainResources;
 
-	ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device, int32_t width, int32_t height);
-	ID3D12DescriptorHeap* CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
+	ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(ID3D12Device* device, int32_t width, int32_t height);
+	ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 	uint32_t descriptorSizeRTV = 0;
 	uint32_t descriptorSizeDSV = 0;
 	uint32_t descriptorSizeSRV = 0;
