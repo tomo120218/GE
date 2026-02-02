@@ -17,31 +17,31 @@
       <UniqueIdentifier>{7bf2d2e1-4fcb-452e-8a38-7f750f36b141}</UniqueIdentifier>
     </Filter>
     <Filter Include="ソース ファイル\engine">
-      <UniqueIdentifier>{303d4865-5b52-44ab-8f31-d623e32d9c89}</UniqueIdentifier>
+      <UniqueIdentifier>{bc544b03-a94d-465f-9ef4-4191f0617d86}</UniqueIdentifier>
     </Filter>
     <Filter Include="ソース ファイル\engine\2d">
-      <UniqueIdentifier>{f53b38af-17ac-498e-a1a0-6920d197f23f}</UniqueIdentifier>
+      <UniqueIdentifier>{7ee36096-e0f3-4846-85e0-e46c139719dc}</UniqueIdentifier>
     </Filter>
     <Filter Include="ソース ファイル\engine\3d">
-      <UniqueIdentifier>{d7db4168-d3cc-4a8f-8654-72dd8e8d8954}</UniqueIdentifier>
+      <UniqueIdentifier>{752e314b-2713-4a10-bb3b-693bc4def865}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\engine\audio">
+      <UniqueIdentifier>{3c291ac6-905b-41bf-89fe-7a805e18afe0}</UniqueIdentifier>
     </Filter>
     <Filter Include="ソース ファイル\engine\base">
-      <UniqueIdentifier>{6e2b992b-09f1-4172-a365-05f11dcad973}</UniqueIdentifier>
+      <UniqueIdentifier>{339a6356-6105-4e00-9109-453414bd1a7b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\engine\io">
+      <UniqueIdentifier>{7a15a012-f7ed-4d63-8f96-1a7d6280d57d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\engine\scene">
+      <UniqueIdentifier>{b874c1c8-cc36-4f92-b6e8-e93fa6b9b5ab}</UniqueIdentifier>
     </Filter>
     <Filter Include="ソース ファイル\engine\math">
       <UniqueIdentifier>{a579354a-4a0a-4860-9023-b571140d7842}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\engine\io">
-      <UniqueIdentifier>{17bd0e17-3105-4c09-8129-df149b7a66cf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\engine\audio">
-      <UniqueIdentifier>{cee7e996-0c4c-431c-b101-bb87ffc01005}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\engine\scene">
-      <UniqueIdentifier>{4ba9b1e2-5b01-4d8d-abd4-027bf8721fc0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ソース ファイル\application">
-      <UniqueIdentifier>{3eb54933-1947-449f-9c69-5459417cecee}</UniqueIdentifier>
+      <UniqueIdentifier>{3fe41e29-38b1-47a1-afdc-cb51a6b3950d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -69,23 +69,23 @@
     <ClCompile Include="externals\imgui\imgui_impl_win32.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="Input.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="engine\base\DirectXCommon.cpp">
+      <Filter>ソース ファイル\engine\base</Filter>
     </ClCompile>
-    <ClCompile Include="WinApp.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="engine\base\Logger.cpp">
+      <Filter>ソース ファイル\engine\base</Filter>
     </ClCompile>
-    <ClCompile Include="DirectXCommon.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="engine\io\Input.cpp">
+      <Filter>ソース ファイル\engine\io</Filter>
     </ClCompile>
-    <ClCompile Include="Logger.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="engine\base\StringUtility.cpp">
+      <Filter>ソース ファイル\engine\base</Filter>
     </ClCompile>
-    <ClCompile Include="StringUtility.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="engine\base\WinApp.cpp">
+      <Filter>ソース ファイル\engine\base</Filter>
     </ClCompile>
-    <ClCompile Include="D3DResourceLeakChecker.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="engine\base\D3DResourceLeakChecker.cpp">
+      <Filter>ソース ファイル\engine\base</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -117,23 +117,23 @@
     <ClInclude Include="externals\imgui\imgui_impl_win32.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="Input.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="engine\base\DirectXCommon.h">
+      <Filter>ソース ファイル\engine\base</Filter>
     </ClInclude>
-    <ClInclude Include="WinApp.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="engine\base\Logger.h">
+      <Filter>ソース ファイル\engine\base</Filter>
     </ClInclude>
-    <ClInclude Include="DirectXCommon.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="engine\io\Input.h">
+      <Filter>ソース ファイル\engine\io</Filter>
     </ClInclude>
-    <ClInclude Include="Logger.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="engine\base\StringUtility.h">
+      <Filter>ソース ファイル\engine\base</Filter>
     </ClInclude>
-    <ClInclude Include="StringUtility.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="engine\base\WinApp.h">
+      <Filter>ソース ファイル\engine\base</Filter>
     </ClInclude>
-    <ClInclude Include="D3DResourceLeakChecker.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="engine\base\D3DResourceLeakChecker.h">
+      <Filter>ソース ファイル\engine\base</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
