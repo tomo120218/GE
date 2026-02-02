@@ -1,4 +1,4 @@
-name: ReleaseBuild
+name: DebugBuild
 
 on:
   push:
@@ -9,7 +9,7 @@ env:
   # リポジトリのルートディレクトリを基点としたソリューションファイルのパス
   SOLUTION_FILE_PATH: project/CG2-00-01.sln
   # Visual Studio の構成(Debug / Release)
-  CONFIGURATION: Release
+  CONFIGURATION: Debug
 
 jobs:
   build:
