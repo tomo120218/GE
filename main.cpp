@@ -2,8 +2,8 @@
 #include <format>
 #include <dxgidebug.h>
 #include <dxcapi.h>
-#include "WinApp.h"
-#include "DirectXCommon.h"
+#include "engine/base/WinApp.h"
+#include "engine/base/DirectXCommon.h"
 #include "D3DResourceLeakChecker.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"

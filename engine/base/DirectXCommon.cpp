@@ -2,11 +2,11 @@
 #include <cassert>
 #include <dxcapi.h>
 #include <format>
-#include "externals/imgui/imgui.h"
-#include "externals/imgui/imgui_impl_win32.h"
-#include "externals/imgui/imgui_impl_dx12.h"
-#include "WinApp.h"
-#include "Logger.h"
+#include "../../externals/imgui/imgui.h"
+#include "../../externals/imgui/imgui_impl_win32.h"
+#include "../../externals/imgui/imgui_impl_dx12.h"
+#include "../../engine/base/WinApp.h"
+#include "../../engine/base/Logger.h"
 #include "StringUtility.h"
 #include <string>
 #include <sstream>
