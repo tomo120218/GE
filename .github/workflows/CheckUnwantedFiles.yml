@@ -9,10 +9,10 @@ on:
     branches:
       - master
 
-      # 検出する不要なファイルのパターンを定義する環境変数。
-      # --- 重要 ---
-      # プロジェクトのニーズに合わせて、これらのリスト変更を変更してください。
-      # パターンはスペース区切りで指定します。
+# 検出する不要なファイルのパターンを定義する環境変数。
+# --- 重要 ---
+# プロジェクトのニーズに合わせて、これらのリスト変更を変更してください。
+# パターンはスペース区切りで指定します。
 env:
   # 特定のファイル名(拡張子など)のパターン
   UNWANTED_NAME_PATTERNS: "*.pdb *.ilk *.user *.ncb 
@@ -26,7 +26,7 @@ bin ipch logs Dump"
 jobs:
   check-files:
     name: 不要なファイルを検出
-    runs-on: nbuntu-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: リポジトリをチェックアウト
