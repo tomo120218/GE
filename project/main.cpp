@@ -23,6 +23,8 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 #include<sstream>
 
 #include "Input.h"
+#include <SpriteCommon.h>
+#include <Sprite.h>
 //#include "Logger.h"
 
 struct Matrix4x4
@@ -973,6 +975,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	input = new Input();
 	input->Initialize(winApp);
 
+	SpriteCommon* spriteCommon = nullptr;
+	// スプライト共通部の初期化
+	spriteCommon = new SpriteCommon;
+	spriteCommon->Initialize();
+
+	Sprite* sprite = new Sprite();
+	sprite->Initialize();
+
 	//ウィンドウの×ボタンが押されるまでループ
 	while (true)
 	{
@@ -1144,6 +1154,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	delete winApp;
 	winApp = nullptr;
 
+	delete sprite;
+	delete spriteCommon;
 	//IDXGIDebug1* debug;
 	//if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug)))) {
 	//	/*debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
