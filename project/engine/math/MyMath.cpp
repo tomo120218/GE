@@ -1,7 +1,7 @@
-#include "math.h"
+#include "MyMath.h"
 #include <cmath>
 #include <cassert>
-namespace math {
+namespace MyMath {
 	// 単位行列
 	Matrix4x4 MakeIdentity4x4() {
 		Matrix4x4 identity;

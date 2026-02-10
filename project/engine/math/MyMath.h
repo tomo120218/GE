@@ -1,7 +1,7 @@
 #pragma once
 #include <cmath>
 #include <cstdint>
-namespace math{
+namespace MyMath {
 	struct Matrix4x4
 	{
 		float m[4][4];

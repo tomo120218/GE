@@ -1,8 +1,9 @@
 #pragma once
-#include <math.h>
+#include <MyMath.h>
 #include <d3d12.h>
 #include <wrl.h>
 #include <string>
+#include <cstdint>
 
 class SpriteCommon;
 
@@ -18,23 +19,23 @@ private:
 
 	// 頂点データ
 	struct VertexData {
-		math::Vector4 position;
-		math::Vector2 texcoord;
-		math::Vector3 normal;
+		MyMath::Vector4 position;
+		MyMath::Vector2 texcoord;
+		MyMath::Vector3 normal;
 	};
 
 	// マテリアルデータ
 	struct Material {
-		math::Vector4 color;
+		MyMath::Vector4 color;
 		int32_t enableLighting;
 		float padding[3];
-		math::Matrix4x4 uvTransform;
+		MyMath::Matrix4x4 uvTransform;
 	};
 
 	// 座標転換行列データ
 	struct TransformationMatrix {
-		math::Matrix4x4 WVP;
-		math::Matrix4x4 World;
+		MyMath::Matrix4x4 WVP;
+		MyMath::Matrix4x4 World;
 	};
 
 	// バッファリソース
