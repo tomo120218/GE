@@ -1,29 +1,37 @@
 #pragma once
-#include <Windows.h>
+#include <windows.h>
 #include <wrl.h>
-#define DIRECTINPUT_VERSION 0x0800
+#define DIRECTINPUT_VERSION  0x0800 //DirectInputのバージン指定
 #include <dinput.h>
 #include "WinApp.h"
+
+
+
 class Input
 {
 public:
+
 	void Initialize(WinApp* winApp);
 
 	void Update();
 
-	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
-
 	bool PushKey(BYTE keyNumber);
+
+
 	bool TriggerKey(BYTE keyNumber);
-
-private:
-
+	//namespace省略
+	template <class T>using ComPtr = Microsoft::WRL::ComPtr<T>;
+private://メンバ変数
+	//キーボードのデバイス
 	ComPtr<IDirectInputDevice8> keyboard;
-	ComPtr<IDirectInput8> diectInput;
+
+	//DirectInputのインスタンス
+	ComPtr<IDirectInput8> directInput;
 
 	BYTE key[256] = {};
-	BYTE keyPre[256] = {};
 
+	//前回の全キーの状態
+	BYTE keyPre[256] = {};
+	//WindowsAPI
 	WinApp* winApp_ = nullptr;
 };
-

@@ -1,14 +1,14 @@
 #include "StringUtility.h"
 #include <Windows.h>
-#include <cstdint>
+
 namespace StringUtility {
+	// log系
 	std::wstring ConvertString(const std::string& str) {
 		if (str.empty()) {
 			return std::wstring();
 		}
 
-		auto sizeNeeded = MultiByteToWideChar(CP_UTF8, 0, reinterpret_cast<const char*>(&str[0]), static_cast<int>(str.size()), NULL, 0
-		);
+		auto sizeNeeded = MultiByteToWideChar(CP_UTF8, 0, reinterpret_cast<const char*>(&str[0]), static_cast<int>(str.size()), NULL, 0);
 		if (sizeNeeded == 0) {
 			return std::wstring();
 		}
@@ -17,11 +17,12 @@ namespace StringUtility {
 		return result;
 	}
 
+
+
 	std::string ConvertString(const std::wstring& str) {
 		if (str.empty()) {
 			return std::string();
 		}
-
 
 		auto sizeNeeded = WideCharToMultiByte(CP_UTF8, 0, str.data(), static_cast<int>(str.size()), NULL, 0, NULL, NULL);
 		if (sizeNeeded == 0) {
