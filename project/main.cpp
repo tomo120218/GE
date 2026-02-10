@@ -26,7 +26,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 #include "Input.h"
 #include <SpriteCommon.h>
 #include <Sprite.h>
-#include <math.cpp>
+#include <MyMath.cpp>
 //#include "Logger.h"
 
 
@@ -34,8 +34,8 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 
 struct VertexData
 {
-	math::Vector4 position;
-	math::Vector2 texcoord;
+	MyMath::Vector4 position;
+	MyMath::Vector2 texcoord;
 };
 
 
@@ -92,9 +92,9 @@ ModelData LoadObjFile(const std::string& directoryPath, const std::string& filen
 {
 	//1.中で必要となる変数の宣言
 	ModelData modelData;//構築するModelData
-	std::vector<math::Vector4> positions;//位置
-	std::vector<math::Vector3>normals;//法線
-	std::vector<math::Vector2>texcoords;//テクスチャ座標
+	std::vector<MyMath::Vector4> positions;//位置
+	std::vector<MyMath::Vector3>normals;//法線
+	std::vector<MyMath::Vector2>texcoords;//テクスチャ座標
 	std::string line;//ファイルから読んだ1行を格納するもの
 
 	//2.ファイルを開く
@@ -110,18 +110,18 @@ ModelData LoadObjFile(const std::string& directoryPath, const std::string& filen
 
 		if (identifier == "v")
 		{
-			math::Vector4 position;
+			MyMath::Vector4 position;
 			s >> position.x >> position.y >> position.z;
 			position.w = 1.0f;
 			positions.push_back(position);
 		} else if (identifier == "vt")
 		{
-			math::Vector2 texcoord;
+			MyMath::Vector2 texcoord;
 			s >> texcoord.x >> texcoord.y;
 			texcoords.push_back(texcoord);
 		} else if (identifier == "vn")
 		{
-			math::Vector3 normal;
+			MyMath::Vector3 normal;
 			s >> normal.x >> normal.y >> normal.z;
 			normals.push_back(normal);
 		} else if (identifier == "f")
@@ -142,13 +142,13 @@ ModelData LoadObjFile(const std::string& directoryPath, const std::string& filen
 					elementIndices[element] = std::stoi(index);
 				}
 				//要素へのIndexから、実際の要素の値を取得して、頂点を構築する
-				math::Vector4 position = positions[elementIndices[0] - 1];
+				MyMath::Vector4 position = positions[elementIndices[0] - 1];
 				position.x *= -1.0f;
 
-				math::Vector2 texcoord = texcoords[elementIndices[1] - 1];
+				MyMath::Vector2 texcoord = texcoords[elementIndices[1] - 1];
 				texcoord.y = 1.0f - texcoord.y;
 
-				math::Vector3 normal = normals[elementIndices[2] - 1];
+				MyMath::Vector3 normal = normals[elementIndices[2] - 1];
 				/*normal.x *= -1.0f;*/
 
 				//VertexData vertex = { position,texcoord};
@@ -653,9 +653,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//*wvpData = math::MakeIdentity4x4();
 
 	//Transform変数を作る
-	math::Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	MyMath::Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 
-	math::Transform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-5.0f} };
+	MyMath::Transform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-5.0f} };
 
 	//ImGui_ImplDX12_Init(device, swapChainDesc.BufferCount, rtvDesc.Format, srvDescriptorHeap, srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 
@@ -791,10 +791,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//}
 
 		//Sprite用のWorldViewProjectionMatrixを作る
-		math::Matrix4x4 worldMatrixSprite = MakeAffineMatrix(transformSprite.scale, transformSprite.rotate, transformSprite.translate);
-		math::Matrix4x4 viewMatrixSprite = math::MakeIdentity4x4();
-		math::Matrix4x4 projectionMatrixSprite = math::MakeOrthographicMatrix(0.0f, 0.0f, float(WinApp::kClientWidth), float(WinApp::kClientHeight), 0.0f, 100.0f);
-		math::Matrix4x4 worldViewProjectionMatrixSprite = Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));
+		MyMath::Matrix4x4 worldMatrixSprite = MyMath::MakeAffineMatrix(transformSprite.scale, transformSprite.rotate, transformSprite.translate);
+		MyMath::Matrix4x4 viewMatrixSprite = MyMath::MakeIdentity4x4();
+		MyMath::Matrix4x4 projectionMatrixSprite = MyMath::MakeOrthographicMatrix(0.0f, 0.0f, float(WinApp::kClientWidth), float(WinApp::kClientHeight), 0.0f, 100.0f);
+		MyMath::Matrix4x4 worldViewProjectionMatrixSprite = Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));
 		*transformationMatrixDataSprite = worldViewProjectionMatrixSprite;
 
 		ImGui_ImplDX12_NewFrame();
@@ -802,12 +802,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::NewFrame();
 
 		transform.rotate.y += 0.03f;
-		math::Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+		MyMath::Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 		* wvpData = worldMatrix;
-		math::Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
-		math::Matrix4x4 viewMatrix = Inverse(cameraMatrix);
-		math::Matrix4x4 projectionMatrix = math::MakePerspectiveFovMatrix(0.45f, float(WinApp::kClientWidth) / float(WinApp::kClientHeight), 0.1f, 100.0f);
-		math::Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
+		MyMath::Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+		MyMath::Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+		MyMath::Matrix4x4 projectionMatrix = MyMath::MakePerspectiveFovMatrix(0.45f, float(WinApp::kClientWidth) / float(WinApp::kClientHeight), 0.1f, 100.0f);
+		MyMath::Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 		*wvpData = worldViewProjectionMatrix;
 
 		ImGui::ShowDemoWindow();

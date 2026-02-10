@@ -32,33 +32,35 @@ void Sprite::Initialize(SpriteCommon* spriteCommon)
     //*materialData = math::Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 
     // マテリアルデータの初期値を書き込む
-    materialData->color = math::Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+    materialData->color = MyMath::Vector4(1.0f, 1.0f, 1.0f, 1.0f);
     materialData->enableLighting = false;
-    materialData->uvTransform = math::MakeIdentity4x4();
+    materialData->uvTransform = MyMath::MakeIdentity4x4();
 
-    wvpResource = spriteCommon->GetDxCommon()->CreateBufferResource(/*device,*/ sizeof(math::Matrix4x4));
+    wvpResource = spriteCommon->GetDxCommon()->CreateBufferResource(/*device,*/ sizeof(MyMath::Matrix4x4));
     //データを書き込む
-	math::Matrix4x4* wvpData = nullptr;
+	MyMath::Matrix4x4* wvpData = nullptr;
 	//書き込むためのアドレスを取得
 	wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
 	//単位行列を書き込んでおく
-	*wvpData = math::MakeIdentity4x4();
+	*wvpData = MyMath::MakeIdentity4x4();
 
     //Sprite用のTransformationMatrix用のリソースを作る。Matrix4x4 1つ分のサイズを用意する
-    transformationMatrixResourceSprite = spriteCommon->GetDxCommon()->CreateBufferResource(/*device,*/ sizeof(math::Matrix4x4));
+    transformationMatrixResourceSprite = spriteCommon->GetDxCommon()->CreateBufferResource(/*device,*/ sizeof(MyMath::Matrix4x4));
     //データを書き込む
-    math::Matrix4x4* transformationMatrixDataSprite = nullptr;
+    MyMath::Matrix4x4* transformationMatrixDataSprite = nullptr;
     //書き込むためのアドレスを取得
     transformationMatrixResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSprite));
     //単位行列を書き込んでおく
-    *transformationMatrixDataSprite = math::MakeIdentity4x4();
+    *transformationMatrixDataSprite = MyMath::MakeIdentity4x4();
 
-    math::Transform transformSprite{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+    MyMath::Transform transformSprite{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 
     // 単位行列を書き込んでおく
-    transformationMatrixData->WVP = math::MakeIdentity4x4();
-    transformationMatrixData->World = math::MakeIdentity4x4();
+    transformationMatrixData->WVP = MyMath::MakeIdentity4x4();
+    transformationMatrixData->World = MyMath::MakeIdentity4x4();
 }
+
+------------------------------------GE3-05-03-p18~
 
 void Sprite::Update() {
 
