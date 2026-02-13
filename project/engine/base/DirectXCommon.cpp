@@ -438,6 +438,8 @@ void DirectXCommon::PreDraw()
 
 	// シザー矩形の設定
 	commandList->RSSetScissorRects(1, &scissorRect);
+
+	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
 void DirectXCommon::PostDraw()

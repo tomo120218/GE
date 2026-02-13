@@ -191,7 +191,7 @@ namespace MyMath {
 		return result;
 	}
 
-	Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float bottom, float nearClip, float farClip)
+	Matrix4x4 MakeOrthorgraphicMatrix(float left, float top, float right, float bottom, float nearClip, float farClip)
 	{
 		return{
 			2.0f / (right - left),0.0f,0.0f,0.0f,

@@ -10,7 +10,7 @@ public: // メンバ変数
 	void Initialize(DirectXCommon* dxCommon);
 
 	//　共通描画設定
-	void SetCommonDrawSettings(ID3D12GraphicsCommandList* commandList);
+	void SetCommonDrawSettings();
 
 	DirectXCommon* GetDxCommon() const { return dxCommon_; }
 
@@ -21,6 +21,9 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
 	// グラフィックスパイプラインステート
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState;
+
+	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob;
+	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob;
 
 	// ルートシグネチャの作成
 	// ルートシグネチャの作成
