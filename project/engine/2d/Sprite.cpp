@@ -139,6 +139,30 @@ void Sprite::Update() {
 		MyMath::Multiply(worldMatrix,
 			MyMath::Multiply(viewMatrix, projectionMatrix));
 	transforMatrixData->World = worldMatrix;
+
+	// メンバ変数の値を見た目に反映する処理
+	transform.translate = { position.x, position.y, 0.0f };
+	transform.rotate = { 0.0f, 0.0f, rotation };
+
+	// 頂点リソースにデータを書きこむ
+	// 左下
+	vertexData[0].position = { 0.0f, 1.0f, 0.0f, 1.0f };
+	vertexData[0].texcoord = { 0.0f, 1.0f };
+	vertexData[0].normal = { 0.0f, 0.0f, -1.0f };
+
+	vertexData[1].position = { 0.0f, 0.0f, 0.0f, 1.0f };
+	vertexData[1].texcoord = { 0.0f, 0.0f };
+	vertexData[1].normal = { 0.0f, 0.0f, -1.0f };
+
+	vertexData[2].position = { 1.0f, 1.0f, 0.0f, 1.0f };
+	vertexData[2].texcoord = { 1.0f, 1.0f };
+	vertexData[2].normal = { 0.0f, 0.0f, -1.0f };
+
+	vertexData[3].position = { 1.0f, 0.0f, 0.0f, 1.0f };
+	vertexData[3].texcoord = { 1.0f, 0.0f };
+	vertexData[3].normal = { 0.0f, 0.0f, -1.0f };
+
+	transform.scale = { size.x, size.y, 1.0f };
 }
 
 void Sprite::Draw()

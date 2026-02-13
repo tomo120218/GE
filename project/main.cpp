@@ -32,6 +32,7 @@ struct VertexData
 {
 	MyMath::Vector4 position;
 	MyMath::Vector2 texcoord;
+	MyMath::Vector3 normal;
 };
 
 struct MaterialData
@@ -681,14 +682,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//textureSrvHandleGPU.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	//SRVの生成
 	dxCommon->GetDevice()->CreateShaderResourceView(textureResouce.Get(), &srvDesc, textureSrvHandleCPU);
-		
+
 	//ID3D12Resource* depthStencilResource = CreateDepthStencilTextureResource(device, WinApp::kClientWidth, WinApp::kClientHeight);
 
 	////Sprite用の頂点リソースを作る
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceTriangle = dxCommon->CreateBufferResource(/*device,*/ sizeof(VertexData) * 3);
-	
-	
-	
+
+
+
 	//----------------------------------------------------------------------------------
 	//頂点バッファビューを作成する
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewTriangle{};
@@ -773,6 +774,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Sprite* sprite = new Sprite();
 	sprite->Initialize(spriteCommon);
 
+	std::vector<Sprite*> sprites;
+	for (uint32_t i = 0; i < 5; ++i) {
+		Sprite* sprite = new Sprite();
+		sprite->Initialize(spriteCommon);
+		float x_position = 100.0f + 150.0f * i;
+		sprite->SetPosition({ x_position, 100.0f });
+		sprites.push_back(sprite);
+	}
+
 	//ウィンドウの×ボタンが押されるまでループ
 	while (true)
 	{
@@ -784,7 +794,39 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 		input->Update();
-		sprite->Update();
+		for (Sprite* sprite : sprites) {
+
+			// 座標変換行列の再計算
+			sprite->Update();
+
+		//------------------------------------------------
+		    // 現在の座標を変数で受ける
+			MyMath::Vector2 position = sprite->GetPosition();
+			// 座標を変更する
+			position += MyMath::Vector2{ 0.1f,0.1f };
+			// 変更を反映する
+			sprite->SetPosition(position);
+
+			// 角度で変化させるテスト
+			float rotation = sprite->GetRotation();
+			rotation += 0.01f;
+			sprite->SetRotation(rotation);
+
+			// 色を変化させるテスト
+			MyMath::Vector4 color = sprite->GetColor();
+			color.x += 0.01f;
+			if (color.x > 1.0f) {
+				color.x -= 1.0f;
+			}
+			sprite->SetColor(color);
+
+			// サイズを変化させるテスト
+			MyMath::Vector2 size = sprite->GetSize();
+			size.x += 0.01f;
+			size.y += 0.01f;
+			sprite->SetSize(size);
+		//------------------------------------------------
+		}
 
 		////ゲームの処理
 		//if (key[DIK_SPACE] && !prekey[DIK_SPACE]) {
@@ -839,7 +881,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::Render();
 
 		//描画先のRTVを設定する
-	
+
 		//commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, nullptr);
 
 		dxCommon->PreDraw();
@@ -849,7 +891,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		dxCommon->GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
 		dxCommon->GetCommandList()->SetPipelineState(graphicsPipelineState.Get());
-		
+
 		dxCommon->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferViewTriangle);
 		//マテリアルCBufferの場所を設定
 		dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
@@ -863,7 +905,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// DepthStencilTextureをウィンドウのサイズで作成
 		spriteCommon->SetCommonDrawSettings();
 
-		sprite->Draw();
+		for (Sprite* sprite : sprites) {
+			sprite->Draw();
+		}
 		ImGui::Render();
 
 		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), dxCommon->GetCommandList());
@@ -940,7 +984,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	delete winApp;
 	winApp = nullptr;
 
-	delete sprite;
+	for (Sprite* sprite : sprites) {
+		if (sprite) {
+			delete sprite; // newしたオブジェクトを解放
+		}
+	}
 	delete spriteCommon;
 	//IDXGIDebug1* debug;
 	//if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug)))) {
