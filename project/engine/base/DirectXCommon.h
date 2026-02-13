@@ -6,6 +6,7 @@
 #include <dxgi1_6.h>
 #include <wrl.h>
 #include <chrono>
+#include <cstdint>
 
 #include "externals/DirectXTex/DirectXTex.h"
 
@@ -105,6 +106,9 @@ public: // メンバ変数
 		const std::wstring& filePath,
 		const wchar_t* profile
 	);
+
+	// 最大SRV数（最大テキスチャ枚数）
+	static const uint32_t kMaxSRVCount;
 
 private:
 	// DirectX12デバイス

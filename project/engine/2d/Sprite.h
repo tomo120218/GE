@@ -4,13 +4,14 @@
 #include <wrl.h>
 #include <string>
 #include <cstdint>
+#include "DirectXCommon.h"
 
 class SpriteCommon;
 
 class Sprite
 {
 public: // メンバ変数
-	void Initialize(SpriteCommon* spriteCommon);
+	void Initialize(SpriteCommon* spriteCommon, std::string textureFilePath);
 
 	void Update();
 
@@ -38,7 +39,12 @@ public: // メンバ変数
 	const MyMath::Vector2& GetSize() const { return size; }
 	void SetSize(const MyMath::Vector2& size) { this->size = size; }
 
+	uint32_t textureIndex = 0;
+
 private:
+
+	DirectXCommon* dxCommon_;
+
 	// 頂点データ
 	struct VertexData {
 		MyMath::Vector4 position;

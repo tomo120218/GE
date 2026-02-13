@@ -1,11 +1,16 @@
 #include "Sprite.h"
 #include "SpriteCommon.h"
 #include "DirectXCommon.h"
+#include "TextureManager.h"
 
-void Sprite::Initialize(SpriteCommon* spriteCommon)
+void Sprite::Initialize(SpriteCommon* spriteCommon, std::string textureFilePath)
 {
 	// 引数で受け取ってメンバ変数にする
 	this->spriteCommon = spriteCommon;
+	
+	TextureManager::GetInstance()->LoadTexture(textureFilePath);
+	// 単位行列を書き込んでおく
+	textureIndex = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureFilePath);
 
 	// バーテックスリソース
 	vertexResource = spriteCommon->GetDxCommon()->CreateBufferResource(sizeof(VertexData) * 6);
@@ -77,22 +82,6 @@ void Sprite::Initialize(SpriteCommon* spriteCommon)
 	indexBufferViewSprite.SizeInBytes = sizeof(uint32_t) * 6;
 	//インデックスはuint32_tとする
 	indexBufferViewSprite.Format = DXGI_FORMAT_R32_UINT;
-
-	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = spriteCommon->GetDxCommon()->GetSRVCPUDescriptorHandle(1);
-	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = spriteCommon->GetDxCommon()->GetSRVGPUDescriptorHandle(1);
-
-	DirectX::ScratchImage mipImages = spriteCommon->GetDxCommon()->LoadTexture("resources/uvChecker.png");
-	//DirectX::ScratchImage mipImages = dxCommon->LoadTexture(modelData.material.textureFilePath);
-
-	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-	textureResouce = spriteCommon->GetDxCommon()->CreateTextureResource(metadata);
-	spriteCommon->GetDxCommon()->UpLoadTextureData(textureResouce, mipImages);
-
-	srvDesc.Format = metadata.format;
-	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
-	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
-	spriteCommon->GetDxCommon()->GetDevice()->CreateShaderResourceView(textureResouce.Get(), &srvDesc, textureSrvHandleCPU);
 }
 
 void Sprite::Update() {
@@ -179,7 +168,7 @@ void Sprite::Draw()
 
 	// SRVのDescriptorTableの先頭を設定
 	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = spriteCommon->GetDxCommon()->GetSRVGPUDescriptorHandle(1);
-	spriteCommon->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
+	spriteCommon->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(textureIndex));
 
 	//描画！(DrawCall/ドローコール)6個のインデックスを使用し1つのインスタンスを描画。その他当面0で良い
 	spriteCommon->GetDxCommon()->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
