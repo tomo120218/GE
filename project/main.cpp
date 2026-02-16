@@ -451,6 +451,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// DirectXの初期化
 	dxCommon = new DirectXCommon();
 	dxCommon->Initialize(winApp);
+	TextureManager::GetInstance()->Initialize(dxCommon);
 
 	//RootSignatureの作成
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
@@ -661,13 +662,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//ImGui_ImplDX12_Init(device, swapChainDesc.BufferCount, rtvDesc.Format, srvDescriptorHeap, srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 
 
-	ーーーーここからはいらない
 	////Textureを読んで転送する
 	////DirectX::ScratchImage mipImages = dxCommon->LoadTexture("resources/uvChecker.png");
 	////DirectX::ScratchImage mipImages = dxCommon->LoadTexture(modelData.material.textureFilePath);
 
 	//const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-	//Microsoft::WRL::ComPtr<ID3D12Resource> textureResouce = dxCommon->CreateTextureResource(metadata);
+	//Microsoft::WRL::ComPtr<ID3D12Resource> textureResource = dxCommon->CreateTextureResource(metadata);
 
 	//// 消すかも？
 	//dxCommon->UpLoadTextureData(textureResouce, mipImages);
@@ -690,9 +690,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	////SRVの生成
 	//dxCommon->GetDevice()->CreateShaderResourceView(textureResouce.Get(), &srvDesc, textureSrvHandleCPU);
 
-	--------------
-		ここのエラーなに
-		TextureManager::GetInstance()->LoadTexture(textureFilePath);
+	//TextureManager::GetInstance()->LoadTexture(textureFilePath);
 
 	//ID3D12Resource* depthStencilResource = CreateDepthStencilTextureResource(device, WinApp::kClientWidth, WinApp::kClientHeight);
 
@@ -913,16 +911,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		dxCommon->GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
 		dxCommon->GetCommandList()->SetPipelineState(graphicsPipelineState.Get());
 
-		dxCommon->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferViewTriangle);
-		//マテリアルCBufferの場所を設定
-		dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
-		dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
+		//dxCommon->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferViewTriangle);
+		////マテリアルCBufferの場所を設定
+		//dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
+		//dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
 
-		//SRVのDexcriptorTableの先頭を設定。2はrootParameter[2]である。
-		//dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
-		dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
-		//モデル描画
-		dxCommon->GetCommandList()->DrawInstanced(3, 1, 0, 0);
+		////SRVのDexcriptorTableの先頭を設定。2はrootParameter[2]である。
+		////dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
+		//dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(0));
+		////モデル描画
+		//dxCommon->GetCommandList()->DrawInstanced(3, 1, 0, 0);
 		// DepthStencilTextureをウィンドウのサイズで作成
 		spriteCommon->SetCommonDrawSettings();
 

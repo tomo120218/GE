@@ -167,7 +167,7 @@ void Sprite::Draw()
 	spriteCommon->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
 
 	// SRVのDescriptorTableの先頭を設定
-	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = spriteCommon->GetDxCommon()->GetSRVGPUDescriptorHandle(1);
+	//D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = spriteCommon->GetDxCommon()->GetSRVGPUDescriptorHandle(1);
 	spriteCommon->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(textureIndex));
 
 	//描画！(DrawCall/ドローコール)6個のインデックスを使用し1つのインスタンスを描画。その他当面0で良い

@@ -24,13 +24,15 @@ void TextureManager::Finalize()
 
 void TextureManager::Initialize(DirectXCommon* dxCommon)
 {
+	 dxCommon_ = dxCommon;
 	// SRVの数と同数
 	textureDatas.reserve(DirectXCommon::kMaxSRVCount);
 }
 
 void TextureManager::LoadTexture(const std::string& filePath)
 {
-	DirectXCommon* dxCommon = nullptr;
+	//DirectXCommon* dxCommon = nullptr;
+	ID3D12Device* device = dxCommon_->GetDevice();
 
 	// 読み込み済みテキスチャを検索
 	auto it = std::find_if(
@@ -56,7 +58,6 @@ void TextureManager::LoadTexture(const std::string& filePath)
 		image);
 	assert(SUCCEEDED(hr));
 
-	DirectX::ScratchImage mipImages{};
 	DirectX::ScratchImage mipImage{};
 	hr = DirectX::GenerateMipMaps(
 		image.GetImages(), 
@@ -75,14 +76,14 @@ void TextureManager::LoadTexture(const std::string& filePath)
 	TextureData& textureData = textureDatas.back();
 
 	textureData.filePath = filePath;
-	textureData.metadata = mipImages.GetMetadata();
-	textureData.resource = dxCommon->CreateTextureResource(textureData.metadata);
+	textureData.metadata = mipImage.GetMetadata();
+	textureData.resource = dxCommon_->CreateTextureResource(textureData.metadata);
 
 	// テキスチャデータの要素数番号をSRVのインデックスとする
 	uint32_t srvIndex = static_cast<uint32_t>(textureDatas.size() - 1) + kSRVIndexTop;
 
-	textureData.srvHandleCPU = dxCommon->GetSRVCPUDescriptorHandle(srvIndex);
-	textureData.srvHandleGPU = dxCommon->GetSRVGPUDescriptorHandle(srvIndex);
+	textureData.srvHandleCPU = dxCommon_->GetSRVCPUDescriptorHandle(srvIndex);
+	textureData.srvHandleGPU = dxCommon_->GetSRVGPUDescriptorHandle(srvIndex);
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 	srvDesc.Format = textureData.metadata.format;
@@ -90,7 +91,10 @@ void TextureManager::LoadTexture(const std::string& filePath)
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
 	srvDesc.Texture2D.MipLevels = UINT(textureData.metadata.mipLevels);
 
-	dxCommon->UpLoadTextureData(textureData.resource, mipImages);
+	// SRVの生成
+	device->CreateShaderResourceView(textureData.resource.Get(), &srvDesc, textureData.srvHandleCPU);
+
+	dxCommon_->UpLoadTextureData(textureData.resource, mipImage);
 
 }
 
