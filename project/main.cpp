@@ -2,9 +2,7 @@
 #include "D3DResourceLeakChecker.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-#define DIRECTINPUT_VERSION 0x0800
-#include<fstream>
+#include <fstream>
 #include "Input.h"
 #include <SpriteCommon.h>
 #include <Sprite.h>
@@ -158,10 +156,7 @@ ModelData LoadObjFile(const std::string& directoryPath, const std::string& filen
 //ウィンドウプロシージャ
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg,
 	WPARAM wparam, LPARAM lparam) {
-	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam))
-	{
-		return true;
-	}
+	
 	//メッセージに応じてゲーム固有の処理を行う
 	switch (msg) {
 		//ウィンドウが破棄された
