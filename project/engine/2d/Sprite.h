@@ -46,6 +46,26 @@ public: // メンバ変数
 	// setter
 	void SetAnchorPoint(const MyMath::Vector2& anchorPoint) { this->anchorPoint = anchorPoint; }
 
+	// 左右フリップ
+	bool isFlipX_ = false;
+	// 上下フリップ
+	bool isFlipY_ = false;
+
+	const BOOL& GetIsFlipX()const { return isFlipX_; }
+	void SetIsFlipX(const BOOL& isFlipX_) { this->isFlipX_ = isFlipX_; }
+
+
+	const BOOL& GetIsFlipY()const { return isFlipY_; }
+	void SetIsFlipY(const BOOL& isFlipY_) { this->isFlipY_ = isFlipY_; }
+
+
+	const MyMath::Vector2& GetTextureLeftTop()const { return textureLeftTop; }
+	void SetTextureLeftTop(const MyMath::Vector2& textureLeftTop) { this->textureLeftTop = textureLeftTop; }
+
+
+	const MyMath::Vector2& GetTextureSize() { return textureSize; }
+	void SetTextureSize(const MyMath::Vector2& textureSize) { this->textureSize = textureSize; }
+
 private:
 
 	DirectXCommon* dxCommon_;
@@ -108,5 +128,13 @@ private:
 	MyMath::Vector2 size = { 100.0f, 100.0f };
 
 	MyMath::Vector2 anchorPoint = { 0.0f, 0.0f };
+
+	// テキスチャ左上座標
+	MyMath::Vector2 textureLeftTop = { 0.0f,0.0f };
+	// テキスチャ切り出しサイズ
+	MyMath::Vector2 textureSize = { 100.0f, 100.0f };
+
+	//テクスチャサイズをイメージに合わせる
+	void AdjustTextureSize();
 };
 
